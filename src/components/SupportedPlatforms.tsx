@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useTranslation } from "@/context/LanguageContext";
 import {
   YoutubeIcon,
   TikTokIcon,
@@ -10,6 +13,8 @@ import {
 } from "./BrandIcons";
 
 export default function SupportedPlatforms() {
+  const { t } = useTranslation();
+
   const platforms = [
     {
       name: "YouTube Downloader",
@@ -36,13 +41,20 @@ export default function SupportedPlatforms() {
     {
       name: "Instagram Downloader",
       slug: "/instagram",
-      desc: "Download Instagram Reels, carousel multi-photos, profile media, and story highlights.",
+      desc: "Download Instagram Reels, carousel multi-photos, profile media, story highlights, and anonymous story viewer.",
       badge: "Reels & Stories",
       badgeColor: "bg-pink-500/10 text-pink-400 border-pink-500/20",
       borderGlow: "hover:border-pink-500/40",
       tag: "HD Quality",
       icon: InstagramIcon,
       iconColor: "text-pink-500",
+      sublinks: [
+        { name: "Story Viewer", href: "/instagram/viewer" },
+        { name: "Reels", href: "/instagram/reels" },
+        { name: "Stories", href: "/instagram/story" },
+        { name: "Photos", href: "/instagram/photo" },
+        { name: "Carousels", href: "/instagram/carousel" },
+      ],
     },
     {
       name: "Twitter / X Downloader",
@@ -84,13 +96,13 @@ export default function SupportedPlatforms() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-emerald-400 mb-2">
-            Multi-Platform Hub
+            {t("platforms.hub")}
           </h2>
           <p className="text-3xl font-extrabold text-white sm:text-4xl">
-            Supported Video & Social Platforms
+            {t("platforms.title")}
           </p>
           <p className="mt-3 text-sm text-slate-400">
-            Dedicated download engines tailored specifically for each platform&apos;s unique media stream layout.
+            {t("platforms.subtitle")}
           </p>
         </div>
 
@@ -116,7 +128,7 @@ export default function SupportedPlatforms() {
                   </div>
 
                   <span className="text-xs text-slate-500 group-hover:text-emerald-400 transition-colors flex items-center gap-1 font-medium">
-                    Open <ArrowRight className="h-3 w-3" />
+                    {t("platforms.open")} <ArrowRight className="h-3 w-3" />
                   </span>
                 </div>
 
@@ -126,6 +138,19 @@ export default function SupportedPlatforms() {
                 <p className="text-xs text-slate-400 leading-relaxed mb-4">
                   {p.desc}
                 </p>
+
+                {p.sublinks && (
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {p.sublinks.map((sub) => (
+                      <span
+                        key={sub.name}
+                        className="rounded-lg bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 text-[10px] font-medium text-pink-300"
+                      >
+                        {sub.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 <div className="flex items-center gap-2 pt-3 border-t border-white/5 text-[11px] text-slate-500 font-medium">
                   <Sparkles className="h-3 w-3 text-emerald-400" />

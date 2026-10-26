@@ -13,6 +13,7 @@ import {
   FileVideo,
 } from "lucide-react";
 import { ExtractedMedia, MediaFormat } from "@/lib/types";
+import { useTranslation } from "@/context/LanguageContext";
 
 interface DownloadCardProps {
   media: ExtractedMedia;
@@ -27,6 +28,7 @@ function formatBytes(bytes?: number): string {
 }
 
 export default function DownloadCard({ media }: DownloadCardProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"video" | "audio" | "thumbnail">("video");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
@@ -119,14 +121,14 @@ export default function DownloadCard({ media }: DownloadCardProps) {
         <div className="flex border-b border-white/5 bg-slate-950/60 px-6">
           <button
             onClick={() => setActiveTab("video")}
-            className={`flex items-center gap-2 border-b-2 py-3 px-4 text-xs font-semibold transition-all ${
+            className={`flex items-center gap-2 border-b-2 py-3 px-4 text-xs font-semibold transition-all cursor-pointer ${
               activeTab === "video"
                 ? "border-emerald-500 text-emerald-400"
                 : "border-transparent text-slate-400 hover:text-white"
             }`}
           >
             <Film className="h-4 w-4" />
-            <span>Video (MP4)</span>
+            <span>{t("card.video")}</span>
             <span className="ml-1 rounded-full bg-white/5 px-1.5 py-0.2 text-[10px]">
               {media.videos.length}
             </span>
@@ -134,26 +136,26 @@ export default function DownloadCard({ media }: DownloadCardProps) {
 
           <button
             onClick={() => setActiveTab("audio")}
-            className={`flex items-center gap-2 border-b-2 py-3 px-4 text-xs font-semibold transition-all ${
+            className={`flex items-center gap-2 border-b-2 py-3 px-4 text-xs font-semibold transition-all cursor-pointer ${
               activeTab === "audio"
                 ? "border-emerald-500 text-emerald-400"
                 : "border-transparent text-slate-400 hover:text-white"
             }`}
           >
             <Music className="h-4 w-4" />
-            <span>Audio (MP3)</span>
+            <span>{t("card.audio")}</span>
           </button>
 
           <button
             onClick={() => setActiveTab("thumbnail")}
-            className={`flex items-center gap-2 border-b-2 py-3 px-4 text-xs font-semibold transition-all ${
+            className={`flex items-center gap-2 border-b-2 py-3 px-4 text-xs font-semibold transition-all cursor-pointer ${
               activeTab === "thumbnail"
                 ? "border-emerald-500 text-emerald-400"
                 : "border-transparent text-slate-400 hover:text-white"
             }`}
           >
             <ImageIcon className="h-4 w-4" />
-            <span>Cover Art / HD Photo</span>
+            <span>{t("card.thumbnail")}</span>
           </button>
         </div>
 
@@ -221,12 +223,12 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                         {isDownloading ? (
                           <>
                             <Check className="h-3.5 w-3.5 text-emerald-400" />
-                            <span>Starting...</span>
+                            <span>{t("card.downloading")}</span>
                           </>
                         ) : (
                           <>
                             <Download className="h-3.5 w-3.5" />
-                            <span>Download {fmt.quality.split(" ")[0]}</span>
+                            <span>{t("card.action")} {fmt.quality.split(" ")[0]}</span>
                           </>
                         )}
                       </button>

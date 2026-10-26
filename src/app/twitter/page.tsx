@@ -2,7 +2,7 @@ import PlatformPageTemplate from "@/components/PlatformPageTemplate";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Twitter / X Video & GIF Downloader | vidFlow",
+  title: "Twitter / X Video & GIF Downloader | VidSnap",
   description:
     "Fast and free X (Twitter) video and GIF downloader. Save viral clips and animations in HD MP4 with audio.",
 };
@@ -20,7 +20,7 @@ export default function TwitterPage() {
         },
         {
           title: "Animated GIF Conversion",
-          desc: "Twitter stores GIFs as looped MP4 videos. vidFlow lets you save them cleanly for instant playback anywhere.",
+          desc: "Twitter stores GIFs as looped MP4 videos. VidSnap lets you save them cleanly for instant playback anywhere.",
         },
         {
           title: "Multiple Resolution Selection",
@@ -30,7 +30,7 @@ export default function TwitterPage() {
       faqs={[
         {
           q: "How to download Twitter (X) video to my phone?",
-          a: "Tap the share icon on the tweet, copy the link, paste it into vidFlow, and select the desired resolution.",
+          a: "Tap the share icon on the tweet, copy the link, paste it into VidSnap, and select the desired resolution.",
         },
         {
           q: "Can I download Twitter GIFs as video?",

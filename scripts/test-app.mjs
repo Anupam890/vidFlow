@@ -30,7 +30,7 @@ async function runTests() {
   console.log(`📁 1. Testing Frontend Pages & Platform Hubs...`);
 
   const pagesToTest = [
-    { path: "/", expectedText: "Universal" },
+    { path: "/", expectedText: "vidFlow" },
     { path: "/youtube", expectedText: "YouTube" },
     { path: "/tiktok", expectedText: "TikTok" },
     { path: "/instagram", expectedText: "Instagram" },

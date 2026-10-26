@@ -13,8 +13,90 @@ const execFileAsync = promisify(execFile);
 export const LOCAL_FFMPEG_DIR =
   "C:\\Users\\anupa\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin";
 
-if (process.env.PATH && !process.env.PATH.includes(LOCAL_FFMPEG_DIR)) {
-  process.env.PATH = `${process.env.PATH};${LOCAL_FFMPEG_DIR}`;
+try {
+  if (fs.existsSync(/*turbopackIgnore: true*/ LOCAL_FFMPEG_DIR)) {
+    if (process.env.PATH && !process.env.PATH.includes(LOCAL_FFMPEG_DIR)) {
+      process.env.PATH = `${process.env.PATH};${LOCAL_FFMPEG_DIR}`;
+    }
+  }
+} catch {}
+
+/**
+ * Discovers ffmpeg location for yt-dlp.
+ * On Docker / Linux production, ffmpeg is in system PATH (/usr/bin/ffmpeg).
+ * On local Windows, uses LOCAL_FFMPEG_DIR if it exists.
+ */
+export function getFfmpegLocationArgs(): string[] {
+  if (process.env.FFMPEG_LOCATION && fs.existsSync(/*turbopackIgnore: true*/ process.env.FFMPEG_LOCATION)) {
+    return ["--ffmpeg-location", process.env.FFMPEG_LOCATION];
+  }
+  try {
+    if (LOCAL_FFMPEG_DIR && fs.existsSync(/*turbopackIgnore: true*/ LOCAL_FFMPEG_DIR)) {
+      return ["--ffmpeg-location", LOCAL_FFMPEG_DIR];
+    }
+  } catch {}
+  return [];
+}
+
+/**
+ * Automatically discovers cookies for platforms requiring authentication (e.g. Instagram stories)
+ */
+export function getCookiesArgs(): string[] {
+  const possiblePaths = [
+    process.env.COOKIES_PATH,
+    process.env.INSTAGRAM_COOKIES_PATH,
+    path.resolve(process.cwd(), "cookies.txt"),
+    path.resolve(process.cwd(), "instagram_cookies.txt"),
+  ].filter(Boolean) as string[];
+
+  for (const p of possiblePaths) {
+    if (fs.existsSync(/*turbopackIgnore: true*/ p)) {
+      return ["--cookies", p];
+    }
+  }
+
+  // Support INSTAGRAM_SESSION_ID in .env or environment
+  const sessionId = process.env.INSTAGRAM_SESSION_ID;
+  if (sessionId) {
+    const cookieFile = path.resolve(os.tmpdir(), "vidsnap_instagram_session.txt");
+    const cookieContent = `# Netscape HTTP Cookie File\n.instagram.com\tTRUE\t/\tTRUE\t2147483647\tsessionid\t${sessionId.trim()}\n`;
+    try {
+      fs.writeFileSync(/*turbopackIgnore: true*/ cookieFile, cookieContent, "utf-8");
+      return ["--cookies", cookieFile];
+    } catch {}
+  }
+
+  return [];
+}
+
+/**
+ * Clean, user-friendly error messages for platform restrictions
+ */
+function formatExtractionError(rawError: any): string {
+  const msg = String(rawError?.stderr || rawError?.message || "");
+
+  if (
+    msg.includes("You need to log in to access this content") ||
+    msg.includes("[instagram:story]") ||
+    msg.includes("Use --cookies") ||
+    msg.includes("login_required")
+  ) {
+    return "Instagram Stories & Highlights require an Instagram session. To enable story downloads, save a cookies.txt file into the vidsnap folder or set INSTAGRAM_SESSION_ID in .env.local. Public Reels and Posts can be downloaded directly without login.";
+  }
+
+  if (msg.includes("empty media response") || msg.includes("Unable to extract data")) {
+    return "Instagram did not return media for this link. The story or post might be expired, private, or temporarily rate-limited. Try public Reels or feed posts.";
+  }
+
+  if (msg.includes("Private video") || msg.includes("account is private")) {
+    return "This media belongs to a private account and cannot be accessed anonymously.";
+  }
+
+  if (msg.includes("Video unavailable") || msg.includes("This content isn't available right now")) {
+    return "This content is unavailable or has been removed from the platform.";
+  }
+
+  return rawError?.stderr || rawError?.message || "Failed to parse video. Please verify the URL is valid and public.";
 }
 
 // In-memory cache for parsed URLs (avoids redundant scraping & rate limits)
@@ -135,13 +217,15 @@ export async function extractMediaInfo(targetUrl: string): Promise<ExtractedMedi
     }
   }
 
+  const cookieArgs = getCookiesArgs();
+
   const args = [
-    "--ffmpeg-location",
-    LOCAL_FFMPEG_DIR,
+    ...getFfmpegLocationArgs(),
     "-J",
     "--no-warnings",
     "--no-check-certificates",
     "--flat-playlist",
+    ...cookieArgs,
     targetUrl,
   ];
 
@@ -253,11 +337,7 @@ export async function extractMediaInfo(targetUrl: string): Promise<ExtractedMedi
     return result;
   } catch (error: any) {
     console.error("Extraction error:", error?.message || error);
-    throw new Error(
-      error?.stderr ||
-        error?.message ||
-        "Failed to parse video. Please verify the URL is valid and public."
-    );
+    throw new Error(formatExtractionError(error));
   }
 }
 
@@ -273,7 +353,7 @@ export async function prepareMediaFile(
   }
 ): Promise<{ filePath: string; cleanup: () => void; size: number }> {
   const tempDir = os.tmpdir();
-  const fileUid = `vidflow_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const fileUid = `vidsnap_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   const targetExt = options.audioOnly ? "mp3" : "mp4";
   const finalPath = path.join(tempDir, `${fileUid}.${targetExt}`);
 
@@ -312,12 +392,13 @@ export async function prepareMediaFile(
 
   // Standard extraction via yt-dlp
   const outputPattern = path.join(tempDir, `${fileUid}.%(ext)s`);
+  const cookieArgs = getCookiesArgs();
 
   const args = [
-    "--ffmpeg-location",
-    LOCAL_FFMPEG_DIR,
+    ...getFfmpegLocationArgs(),
     "--no-warnings",
     "--no-check-certificates",
+    ...cookieArgs,
   ];
 
   if (options.audioOnly) {
@@ -338,8 +419,8 @@ export async function prepareMediaFile(
   });
 
   let generatedFile = finalPath;
-  if (!fs.existsSync(generatedFile)) {
-    const files = fs.readdirSync(tempDir).filter((f) => f.startsWith(fileUid));
+  if (!fs.existsSync(/*turbopackIgnore: true*/ generatedFile)) {
+    const files = fs.readdirSync(/*turbopackIgnore: true*/ tempDir).filter((f) => f.startsWith(fileUid));
     if (files.length > 0) {
       generatedFile = path.join(tempDir, files[0]);
     } else {
@@ -347,12 +428,12 @@ export async function prepareMediaFile(
     }
   }
 
-  const stat = fs.statSync(generatedFile);
+  const stat = fs.statSync(/*turbopackIgnore: true*/ generatedFile);
 
   const cleanup = () => {
     try {
-      if (fs.existsSync(generatedFile)) {
-        fs.unlinkSync(generatedFile);
+      if (fs.existsSync(/*turbopackIgnore: true*/ generatedFile)) {
+        fs.unlinkSync(/*turbopackIgnore: true*/ generatedFile);
       }
     } catch {}
   };

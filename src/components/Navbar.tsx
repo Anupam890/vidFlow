@@ -2,22 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { DownloadCloud, Sparkles } from "lucide-react";
-import { useState } from "react";
-import ExtensionModal from "./ExtensionModal";
+import { DownloadCloud } from "lucide-react";
+import InstagramNavDropdown from "./InstagramNavDropdown";
+import LanguageSelector from "./LanguageSelector";
+import { useTranslation } from "@/context/LanguageContext";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [showExtension, setShowExtension] = useState(false);
+  const { t } = useTranslation();
 
   const links = [
-    { name: "Universal", href: "/" },
-    { name: "YouTube", href: "/youtube" },
-    { name: "TikTok", href: "/tiktok" },
-    { name: "Instagram", href: "/instagram" },
-    { name: "Twitter / X", href: "/twitter" },
-    { name: "Reddit", href: "/reddit" },
-    { name: "Pinterest", href: "/pinterest" },
+    { name: t("nav.youtube"), id: "youtube", href: "/youtube" },
+    { name: t("nav.tiktok"), id: "tiktok", href: "/tiktok" },
+    { name: t("nav.instagram"), id: "instagram", href: "/instagram" },
+    { name: t("nav.twitter"), id: "twitter", href: "/twitter" },
+    { name: t("nav.reddit"), id: "reddit", href: "/reddit" },
+    { name: t("nav.pinterest"), id: "pinterest", href: "/pinterest" },
   ];
 
   return (
@@ -32,11 +32,11 @@ export default function Navbar() {
               </div>
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-tight text-white flex items-center gap-1">
-                vid<span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Flow</span>
+              <span className="text-xl font-bold tracking-tight text-white flex items-center gap-0.5">
+                Vid<span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Snap</span>
               </span>
               <span className="text-[10px] uppercase tracking-wider text-emerald-400/80 font-medium -mt-1">
-                Ultra Fast Downloader
+                {t("nav.tagline")}
               </span>
             </div>
           </Link>
@@ -44,6 +44,10 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1 rounded-full border border-white/5 bg-slate-900/60 p-1">
             {links.map((link) => {
+              if (link.id === "instagram") {
+                return <InstagramNavDropdown key={link.href} />;
+              }
+
               const isActive = pathname === link.href;
               return (
                 <Link
@@ -62,41 +66,39 @@ export default function Navbar() {
           </nav>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowExtension(true)}
-              className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-400"
-            >
-              <Sparkles className="h-4 w-4 text-emerald-400" />
-              <span className="hidden sm:inline">Get Extension</span>
-            </button>
+          <div className="flex items-center gap-2">
+            <LanguageSelector />
           </div>
         </div>
 
         {/* Mobile Sub-Navigation Bar */}
-        <div className="lg:hidden flex overflow-x-auto border-t border-white/5 px-4 py-2 gap-2 scrollbar-none bg-[#090d16]/95">
+        <div className="lg:hidden flex overflow-x-auto border-t border-white/5 px-4 py-2 gap-2 scrollbar-none bg-[#090d16]/95 items-center">
           {links.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive =
+              link.id === "instagram"
+                ? pathname.startsWith("/instagram")
+                : pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`whitespace-nowrap rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
+                className={`whitespace-nowrap rounded-lg px-3 py-1 text-xs font-medium transition-colors flex items-center gap-1 ${
                   isActive
-                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                    ? link.id === "instagram"
+                      ? "bg-pink-500/15 text-pink-400 border border-pink-500/30"
+                      : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
-                {link.name}
+                <span>{link.name}</span>
+                {link.id === "instagram" && (
+                  <span className="text-[10px] text-pink-400">▾</span>
+                )}
               </Link>
             );
           })}
         </div>
       </header>
-
-      {showExtension && (
-        <ExtensionModal onClose={() => setShowExtension(false)} />
-      )}
     </>
   );
 }

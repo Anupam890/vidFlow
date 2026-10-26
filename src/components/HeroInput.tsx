@@ -11,34 +11,27 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { ExtractedMedia, Platform } from "@/lib/types";
+import { useTranslation } from "@/context/LanguageContext";
 
 interface HeroInputProps {
   onExtractSuccess: (data: ExtractedMedia) => void;
   initialPlatform?: Platform;
-  defaultTitle?: string;
+  defaultTitle?: string | React.ReactNode;
   defaultSubtitle?: string;
+  placeholder?: string;
+  sampleUrls?: { label: string; url: string }[];
+  topSlot?: React.ReactNode;
 }
-
-const SAMPLE_URLS = [
-  {
-    label: "YouTube 4K Demo",
-    url: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
-  },
-  {
-    label: "Creative Commons Short",
-    url: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-  },
-  {
-    label: "TikTok / Reel Link",
-    url: "https://www.tiktok.com/@tiktok/video/7106594312292453678",
-  },
-];
 
 export default function HeroInput({
   onExtractSuccess,
   defaultTitle,
   defaultSubtitle,
+  placeholder,
+  sampleUrls,
+  topSlot,
 }: HeroInputProps) {
+  const { t } = useTranslation();
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
@@ -112,21 +105,23 @@ export default function HeroInput({
         <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
           {defaultTitle || (
             <>
-              Download Any Video & Audio in{" "}
+              {t("hero.title_part1")}{" "}
               <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-                Full 4K Quality
+                {t("hero.title_part2")}
               </span>
             </>
           )}
         </h1>
 
         <p className="mx-auto mt-4 max-w-2xl text-base text-slate-400 sm:text-lg">
-          {defaultSubtitle ||
-            "Fastest online video downloader for YouTube, TikTok, Instagram, Twitter/X, and 1,000+ sources. No app installation needed."}
+          {defaultSubtitle || t("hero.subtitle")}
         </p>
 
+        {/* Top Slot (e.g. Dropdown Mode Selector) */}
+        {topSlot && <div className="mt-8 mb-2 flex justify-center">{topSlot}</div>}
+
         {/* Input Bar Form */}
-        <div className="mt-8 relative mx-auto max-w-3xl">
+        <div className="mt-6 relative mx-auto max-w-3xl">
           <div className="group relative rounded-2xl p-1 bg-gradient-to-r from-emerald-500/30 via-teal-500/20 to-cyan-500/30 shadow-2xl shadow-emerald-500/10 transition-all focus-within:from-emerald-500 focus-within:to-cyan-500">
             <div className="flex flex-col sm:flex-row items-center gap-2 rounded-xl bg-[#0b1120] p-2">
               {/* Main Text Input */}
@@ -137,7 +132,7 @@ export default function HeroInput({
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleExtract()}
-                  placeholder="Paste URL from YouTube, TikTok, Instagram, Facebook, X..."
+                  placeholder={placeholder || t("hero.placeholder")}
                   className="w-full bg-transparent pl-11 pr-24 py-3.5 text-sm sm:text-base text-white placeholder-slate-500 focus:outline-none"
                   disabled={loading}
                 />
@@ -146,7 +141,7 @@ export default function HeroInput({
                   {url ? (
                     <button
                       onClick={() => setUrl("")}
-                      className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+                      className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                       title="Clear input"
                     >
                       <X className="h-4 w-4" />
@@ -154,11 +149,11 @@ export default function HeroInput({
                   ) : (
                     <button
                       onClick={handlePaste}
-                      className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-slate-800/90 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors"
+                      className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-slate-800/90 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer"
                       title="Paste from clipboard"
                     >
                       <ClipboardPaste className="h-3.5 w-3.5 text-emerald-400" />
-                      <span>Paste</span>
+                      <span>{t("hero.paste")}</span>
                     </button>
                   )}
                 </div>
@@ -173,11 +168,11 @@ export default function HeroInput({
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Processing...</span>
+                    <span>{t("hero.processing")}</span>
                   </>
                 ) : (
                   <>
-                    <span>Download</span>
+                    <span>{t("hero.download")}</span>
                     <ArrowRight className="h-4 w-4" />
                   </>
                 )}
@@ -190,9 +185,9 @@ export default function HeroInput({
             <div className="mt-4 rounded-xl border border-white/10 bg-slate-900/80 p-4 text-left animate-in fade-in duration-200">
               <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
                 <span className="font-medium text-emerald-400">
-                  {loadingStep === 1 && "Connecting to media source..."}
-                  {loadingStep === 2 && "Extracting high-definition stream formats..."}
-                  {loadingStep === 3 && "Organizing video, audio & thumbnail options..."}
+                  {loadingStep === 1 && t("hero.step1")}
+                  {loadingStep === 2 && t("hero.step2")}
+                  {loadingStep === 3 && t("hero.step3")}
                 </span>
                 <span className="font-mono text-slate-500">
                   {loadingStep === 1 && "30%"}
@@ -220,22 +215,7 @@ export default function HeroInput({
             </div>
           )}
 
-          {/* Sample URL Chips */}
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-400">
-            <span className="text-slate-500">Quick Test:</span>
-            {SAMPLE_URLS.map((sample) => (
-              <button
-                key={sample.label}
-                onClick={() => {
-                  setUrl(sample.url);
-                  handleExtract(sample.url);
-                }}
-                className="rounded-lg border border-white/5 bg-slate-900/60 px-2.5 py-1 text-slate-300 hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-400 transition-all"
-              >
-                {sample.label}
-              </button>
-            ))}
-          </div>
+
         </div>
       </div>
     </section>

@@ -1,0 +1,25 @@
+services:
+  vidsnap:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vidsnap:latest
+    container_name: vidsnap
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      # Optional: set Instagram session ID for private stories
+      - INSTAGRAM_SESSION_ID=${INSTAGRAM_SESSION_ID:-}
+    # Optional volume for cookies.txt authentication
+    # volumes:
+    #   - ./cookies.txt:/app/cookies.txt:ro
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

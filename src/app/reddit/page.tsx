@@ -2,7 +2,7 @@ import PlatformPageTemplate from "@/components/PlatformPageTemplate";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Reddit Video Downloader with Audio / Sound | vidFlow",
+  title: "Reddit Video Downloader with Audio / Sound | VidSnap",
   description:
     "Download Reddit videos with sound automatically merged into a clean MP4 file. Fast, free and high definition.",
 };
@@ -16,7 +16,7 @@ export default function RedditPage() {
       tips={[
         {
           title: "Audio + Video Merged",
-          desc: "Reddit normally separates audio into a hidden DASH stream, resulting in silent videos. vidFlow merges both into a single MP4 with sound.",
+          desc: "Reddit normally separates audio into a hidden DASH stream, resulting in silent videos. VidSnap merges both into a single MP4 with sound.",
         },
         {
           title: "Shortlinks & Full Links",
@@ -30,11 +30,11 @@ export default function RedditPage() {
       faqs={[
         {
           q: "Why do Reddit videos usually download without audio elsewhere?",
-          a: "Reddit uses adaptive DASH streaming where audio and video are hosted in separate files. vidFlow merges both streams on the fly using FFmpeg.",
+          a: "Reddit uses adaptive DASH streaming where audio and video are hosted in separate files. VidSnap merges both streams on the fly using FFmpeg.",
         },
         {
           q: "Does this work on mobile browsers?",
-          a: "Yes, you can use vidFlow in Safari, Chrome, or any mobile browser on iOS and Android.",
+          a: "Yes, you can use VidSnap in Safari, Chrome, or any mobile browser on iOS and Android.",
         },
       ]}
     />

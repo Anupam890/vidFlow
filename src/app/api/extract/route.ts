@@ -13,12 +13,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const trimmedUrl = url.trim();
-    if (!trimmedUrl.startsWith("http://") && !trimmedUrl.startsWith("https://")) {
-      return NextResponse.json(
-        { error: "Invalid URL format. Please include http:// or https://" },
-        { status: 400 }
-      );
+    let trimmedUrl = url.trim();
+
+    // Normalize Instagram handle or scheme if missing
+    if (trimmedUrl.startsWith("@")) {
+      trimmedUrl = `https://www.instagram.com/${trimmedUrl.slice(1).replace(/\/$/, "")}/`;
+    } else if (trimmedUrl.startsWith("instagram.com/")) {
+      trimmedUrl = `https://www.${trimmedUrl}`;
+    } else if (!trimmedUrl.startsWith("http://") && !trimmedUrl.startsWith("https://")) {
+      if (/^[a-zA-Z0-9._]{1,30}$/.test(trimmedUrl)) {
+        trimmedUrl = `https://www.instagram.com/${trimmedUrl}/`;
+      } else {
+        return NextResponse.json(
+          { error: "Invalid URL format. Please include http:// or https://" },
+          { status: 400 }
+        );
+      }
     }
 
     const data = await extractMediaInfo(trimmedUrl);

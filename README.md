@@ -1,8 +1,8 @@
-# vidFlow ⚡
+# VidSnap ⚡
 
 A modern, lightning-fast, and elegant web application for downloading high-definition videos and extracting audio from popular social media platforms including YouTube, TikTok, Instagram, Twitter/X, Pinterest, and Reddit.
 
-![vidFlow Preview](public/next.svg)
+![VidSnap Preview](public/next.svg)
 
 ## ✨ Features
 

@@ -1,24 +1,29 @@
+"use client";
+
 import { Copy, SlidersHorizontal, CheckCircle2 } from "lucide-react";
+import { useTranslation } from "@/context/LanguageContext";
 
 export default function HowItWorks() {
+  const { t } = useTranslation();
+
   const steps = [
     {
       num: "01",
       icon: Copy,
-      title: "Copy the Video URL",
-      desc: "Open YouTube, TikTok, or Instagram. Tap 'Share' on your favorite video and select 'Copy Link'.",
+      title: t("how.s1_title"),
+      desc: t("how.s1_desc"),
     },
     {
       num: "02",
       icon: SlidersHorizontal,
-      title: "Paste & Pick Quality",
-      desc: "Paste the URL into the vidFlow search bar. Choose your target format: 4K, 1080p, 720p MP4, or MP3 audio.",
+      title: t("how.s2_title"),
+      desc: t("how.s2_desc"),
     },
     {
       num: "03",
       icon: CheckCircle2,
-      title: "Download Instantly",
-      desc: "Click 'Download' and your browser saves the video immediately into your local Downloads folder.",
+      title: t("how.s3_title"),
+      desc: t("how.s3_desc"),
     },
   ];
 
@@ -27,13 +32,13 @@ export default function HowItWorks() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-emerald-400 mb-2">
-            Easy Workflow
+            {t("how.tag")}
           </h2>
           <p className="text-3xl font-extrabold text-white sm:text-4xl">
-            How to Download in 3 Steps
+            {t("how.title")}
           </p>
           <p className="mt-3 text-sm text-slate-400">
-            No registration, zero installation, works in seconds.
+            {t("how.subtitle")}
           </p>
         </div>
 

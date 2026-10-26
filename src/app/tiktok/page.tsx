@@ -2,7 +2,7 @@ import PlatformPageTemplate from "@/components/PlatformPageTemplate";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "TikTok Video Downloader Without Watermark | vidFlow",
+  title: "TikTok Video Downloader Without Watermark | VidSnap",
   description:
     "Download TikTok videos without watermark in HD MP4 or extract original audio sounds to MP3. Free, fast and unlimited.",
 };
@@ -30,15 +30,15 @@ export default function TikTokPage() {
       faqs={[
         {
           q: "How do I download a TikTok video without the watermark?",
-          a: "Simply open the TikTok app, click 'Share' -> 'Copy Link', paste the link into vidFlow, and select 'Download'. The saved video will have zero watermarks.",
+          a: "Simply open the TikTok app, click 'Share' -> 'Copy Link', paste the link into VidSnap, and select 'Download'. The saved video will have zero watermarks.",
         },
         {
           q: "Can I extract the music or audio track from a TikTok?",
           a: "Yes! Switch to the 'Audio (MP3)' tab after analyzing the link to save the audio file.",
         },
         {
-          q: "Does vidFlow work with private TikTok videos?",
-          a: "No, vidFlow only processes publicly accessible TikTok videos.",
+          q: "Does VidSnap work with private TikTok videos?",
+          a: "No, VidSnap only processes publicly accessible TikTok videos.",
         },
       ]}
     />

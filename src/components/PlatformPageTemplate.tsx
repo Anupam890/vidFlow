@@ -56,7 +56,7 @@ export default function PlatformPageTemplate({
                 Optimized Extraction
               </span>
               <h2 className="text-2xl font-bold text-white mt-1">
-                How vidFlow Handles {platform.toUpperCase()} Media
+                How VidSnap Handles {platform.toUpperCase()} Media
               </h2>
             </div>
 
@@ -78,7 +78,7 @@ export default function PlatformPageTemplate({
           </div>
         </section>
 
-        {/* Universal Features */}
+        {/* Core Features */}
         <Features />
 
         {/* Walkthrough */}

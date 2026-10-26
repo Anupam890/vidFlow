@@ -2,7 +2,7 @@ import PlatformPageTemplate from "@/components/PlatformPageTemplate";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pinterest Video & GIF Downloader | vidFlow",
+  title: "Pinterest Video & GIF Downloader | VidSnap",
   description:
     "Free Pinterest Video Downloader. Save pins, videos, and looping GIFs in original resolution without software.",
 };
@@ -30,11 +30,11 @@ export default function PinterestPage() {
       faqs={[
         {
           q: "How to download a video from Pinterest?",
-          a: "Copy the pin link using the share menu on Pinterest, paste the URL into vidFlow, and hit Download.",
+          a: "Copy the pin link using the share menu on Pinterest, paste the URL into VidSnap, and hit Download.",
         },
         {
           q: "Can I save high-resolution GIFs from Pinterest?",
-          a: "Yes, vidFlow downloads Pinterest GIFs in smooth, universal MP4 video format.",
+          a: "Yes, VidSnap downloads Pinterest GIFs in smooth, high-quality MP4 video format.",
         },
       ]}
     />

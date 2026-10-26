@@ -8,16 +8,16 @@ export default function Faq() {
 
   const faqs = [
     {
-      q: "Is vidFlow completely free to use?",
-      a: "Yes. vidFlow is 100% free with unlimited downloads. You do not need to register an account, enter credit card details, or install third-party plugins.",
+      q: "Is VidSnap completely free to use?",
+      a: "Yes. VidSnap is 100% free with unlimited downloads. You do not need to register an account, enter credit card details, or install third-party plugins.",
     },
     {
-      q: "Does vidFlow download TikTok videos without a watermark?",
-      a: "Yes! vidFlow automatically strips the TikTok watermark, giving you a clean, full-resolution MP4 video suitable for archiving or offline viewing.",
+      q: "Does VidSnap download TikTok videos without a watermark?",
+      a: "Yes! VidSnap automatically strips the TikTok watermark, giving you a clean, full-resolution MP4 video suitable for archiving or offline viewing.",
     },
     {
       q: "Why do high-res (1080p / 4K) videos from other downloaders often have no audio?",
-      a: "Platforms like YouTube and Reddit deliver video and audio as separate adaptive streams for resolutions higher than 720p. Most downloaders only grab the video stream. vidFlow utilizes server-side FFmpeg remuxing to seamlessly combine the highest-quality video and audio into a single complete MP4 file.",
+      a: "Platforms like YouTube and Reddit deliver video and audio as separate adaptive streams for resolutions higher than 720p. Most downloaders only grab the video stream. VidSnap utilizes server-side FFmpeg remuxing to seamlessly combine the highest-quality video and audio into a single complete MP4 file.",
     },
     {
       q: "Can I download audio or convert videos to MP3?",
@@ -25,14 +25,14 @@ export default function Faq() {
     },
     {
       q: "Can I download private videos or stories?",
-      a: "vidFlow is designed to process publicly accessible media links. Content that requires logging into private accounts or DRM-encrypted paid content cannot be downloaded.",
+      a: "VidSnap is designed to process publicly accessible media links. Content that requires logging into private accounts or DRM-encrypted paid content cannot be downloaded.",
     },
     {
       q: "Where do my downloaded videos go on my phone or laptop?",
       a: "Downloaded files are automatically saved to your operating system's default 'Downloads' folder (or your browser's designated download folder). On mobile devices, they will also appear in your Files app or Gallery.",
     },
     {
-      q: "Is it legal to download videos using vidFlow?",
+      q: "Is it legal to download videos using VidSnap?",
       a: "Downloading videos for personal offline backup, fair use, research, or viewing public content you have rights to is generally permitted. However, you must respect platform terms of service and copyright laws. Do not redistribute copyrighted material without permission.",
     },
   ];
