@@ -18,10 +18,27 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // Clean filename for safe content disposition header
-  const safeTitle = rawTitle.replace(/[\\/:*?"<>|]+/g, "_").slice(0, 100);
-  const filename = `${safeTitle}.${rawExt}`;
-  const encodedFilename = encodeURIComponent(filename);
+  // Sanitize filename for Content-Disposition header (RFC 6266 & RFC 5987)
+  // 1. Unicode title for modern browsers via filename*=UTF-8''
+  const safeUnicodeTitle = rawTitle
+    .replace(/[\r\n\t]/g, " ")
+    .replace(/[\\/:*?"<>|]/g, "_")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 100) || "video";
+  const utf8Filename = `${safeUnicodeTitle}.${rawExt}`;
+  const encodedUtf8Filename = encodeURIComponent(utf8Filename).replace(
+    /['()*]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
+  );
+
+  // 2. Strict ASCII fallback for legacy filename="..." parameter (ByteString requires char code <= 255)
+  const asciiOnlyTitle = safeUnicodeTitle
+    .replace(/[^\x20-\x7E]/g, "")
+    .replace(/["\\]/g, "")
+    .trim()
+    .slice(0, 80) || "video";
+  const asciiFilename = `${asciiOnlyTitle}.${rawExt}`;
 
   try {
     const { filePath, cleanup, size } = await prepareMediaFile(targetUrl, {
@@ -48,7 +65,7 @@ export async function GET(req: NextRequest) {
       status: 200,
       headers: {
         "Content-Type": contentType,
-        "Content-Disposition": `attachment; filename="${filename}"; filename*=UTF-8''${encodedFilename}`,
+        "Content-Disposition": `attachment; filename="${asciiFilename}"; filename*=UTF-8''${encodedUtf8Filename}`,
         "Content-Length": size.toString(),
         "Accept-Ranges": "bytes",
         "Cache-Control": "no-cache",
