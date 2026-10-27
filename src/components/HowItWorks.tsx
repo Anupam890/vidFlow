@@ -28,39 +28,43 @@ export default function HowItWorks() {
   ];
 
   return (
-    <section className="relative py-20 border-t border-white/5 bg-[#0b101d]">
+    <section className="relative py-20 border-t border-slate-200/80 bg-slate-50/60">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-emerald-400 mb-2">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-2">
             {t("how.tag")}
           </h2>
-          <p className="text-3xl font-extrabold text-white sm:text-4xl">
+          <p className="text-3xl font-extrabold text-slate-900 sm:text-4xl">
             {t("how.title")}
           </p>
-          <p className="mt-3 text-sm text-slate-400">
+          <p className="mt-3 text-sm text-slate-600">
             {t("how.subtitle")}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-          {steps.map((s, idx) => {
+          {steps.map((s) => {
             const Icon = s.icon;
             return (
               <div
                 key={s.num}
-                className="relative rounded-2xl border border-white/5 bg-slate-900/60 p-6 backdrop-blur-sm"
+                className="relative rounded-2xl border border-slate-200 bg-white p-6 shadow-xs hover:shadow-xl transition-all"
               >
                 <div className="flex items-center justify-between mb-6">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 shadow-xs">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <span className="font-mono text-2xl font-black text-slate-700">
+                  <span className="font-mono text-3xl font-black text-slate-200">
                     {s.num}
                   </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-white mb-2">{s.title}</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">{s.desc}</p>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">
+                  {s.title}
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  {s.desc}
+                </p>
               </div>
             );
           })}

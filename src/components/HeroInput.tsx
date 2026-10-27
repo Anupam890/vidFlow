@@ -7,7 +7,6 @@ import {
   X,
   ArrowRight,
   Loader2,
-  Sparkles,
   AlertCircle,
 } from "lucide-react";
 import { ExtractedMedia, Platform } from "@/lib/types";
@@ -28,7 +27,6 @@ export default function HeroInput({
   defaultTitle,
   defaultSubtitle,
   placeholder,
-  sampleUrls,
   topSlot,
 }: HeroInputProps) {
   const { t } = useTranslation();
@@ -36,18 +34,6 @@ export default function HeroInput({
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
-
-  const handlePaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      if (text) {
-        setUrl(text);
-        handleExtract(text);
-      }
-    } catch {
-      setError("Clipboard access denied. Please paste manually into the input box.");
-    }
-  };
 
   const handleExtract = async (targetUrl?: string) => {
     const urlToProcess = (targetUrl || url).trim();
@@ -92,38 +78,46 @@ export default function HeroInput({
     }
   };
 
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text && text.trim()) {
+        const clean = text.trim();
+        setUrl(clean);
+        // Auto-fetch immediately on pasting via button
+        handleExtract(clean);
+      }
+    } catch {
+      setError("Clipboard access denied. Please paste manually into the input box.");
+    }
+  };
+
   return (
     <section className="relative pt-12 pb-16 md:pt-20 md:pb-24">
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        {/* Top Feature Pill */}
-        {/* <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-medium text-emerald-400 mb-6 shadow-sm shadow-emerald-500/10">
-          <Sparkles className="h-3.5 w-3.5 animate-pulse" />
-          <span>Watermark-Free & High Speed Chunked Streaming</span>
-        </div> */}
-
         {/* Dynamic Titles */}
-        <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
+        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
           {defaultTitle || (
             <>
               {t("hero.title_part1")}{" "}
-              <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
                 {t("hero.title_part2")}
               </span>
             </>
           )}
         </h1>
 
-        <p className="mx-auto mt-4 max-w-2xl text-base text-slate-400 sm:text-lg">
+        <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg">
           {defaultSubtitle || t("hero.subtitle")}
         </p>
 
-        {/* Top Slot (e.g. Dropdown Mode Selector) */}
+        {/* Top Slot */}
         {topSlot && <div className="mt-8 mb-2 flex justify-center">{topSlot}</div>}
 
         {/* Input Bar Form */}
-        <div className="mt-6 relative mx-auto max-w-3xl">
-          <div className="group relative rounded-2xl p-1 bg-gradient-to-r from-emerald-500/30 via-teal-500/20 to-cyan-500/30 shadow-2xl shadow-emerald-500/10 transition-all focus-within:from-emerald-500 focus-within:to-cyan-500">
-            <div className="flex flex-col sm:flex-row items-center gap-2 rounded-xl bg-[#0b1120] p-2">
+        <div className="mt-8 relative mx-auto max-w-3xl">
+          <div className="group relative rounded-2xl p-1 bg-gradient-to-r from-emerald-500/25 via-teal-500/20 to-cyan-500/25 shadow-xl shadow-slate-200/80 transition-all focus-within:from-emerald-500 focus-within:to-cyan-500">
+            <div className="flex flex-col sm:flex-row items-center gap-2 rounded-xl bg-white p-2 border border-slate-200/80">
               {/* Main Text Input */}
               <div className="relative flex-1 w-full flex items-center">
                 <Search className="absolute left-3.5 h-5 w-5 text-slate-400" />
@@ -131,9 +125,18 @@ export default function HeroInput({
                   type="text"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
+                  onPaste={(e) => {
+                    // Auto-fetch immediately on pasting into input box
+                    const pasted = e.clipboardData?.getData("text");
+                    if (pasted && pasted.trim()) {
+                      const clean = pasted.trim();
+                      setUrl(clean);
+                      handleExtract(clean);
+                    }
+                  }}
                   onKeyDown={(e) => e.key === "Enter" && handleExtract()}
                   placeholder={placeholder || t("hero.placeholder")}
-                  className="w-full bg-transparent pl-11 pr-24 py-3.5 text-sm sm:text-base text-white placeholder-slate-500 focus:outline-none"
+                  className="w-full bg-transparent pl-11 pr-24 py-3.5 text-sm sm:text-base text-slate-900 placeholder-slate-400 focus:outline-none font-medium"
                   disabled={loading}
                 />
 
@@ -141,7 +144,7 @@ export default function HeroInput({
                   {url ? (
                     <button
                       onClick={() => setUrl("")}
-                      className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                      className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors cursor-pointer"
                       title="Clear input"
                     >
                       <X className="h-4 w-4" />
@@ -149,10 +152,10 @@ export default function HeroInput({
                   ) : (
                     <button
                       onClick={handlePaste}
-                      className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-slate-800/90 px-3 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer"
-                      title="Paste from clipboard"
+                      className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-100/80 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200 hover:text-slate-900 transition-colors cursor-pointer shadow-xs"
+                      title="Paste from clipboard and fetch"
                     >
-                      <ClipboardPaste className="h-3.5 w-3.5 text-emerald-400" />
+                      <ClipboardPaste className="h-3.5 w-3.5 text-emerald-600" />
                       <span>{t("hero.paste")}</span>
                     </button>
                   )}
@@ -163,7 +166,7 @@ export default function HeroInput({
               <button
                 onClick={() => handleExtract()}
                 disabled={loading}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 px-7 py-3.5 text-sm font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 hover:opacity-95 disabled:opacity-50 transition-all shrink-0 cursor-pointer"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:opacity-95 disabled:opacity-50 transition-all shrink-0 cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -182,20 +185,20 @@ export default function HeroInput({
 
           {/* Loading Progress Feedback */}
           {loading && (
-            <div className="mt-4 rounded-xl border border-white/10 bg-slate-900/80 p-4 text-left animate-in fade-in duration-200">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                <span className="font-medium text-emerald-400">
+            <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm animate-in fade-in duration-200">
+              <div className="flex items-center justify-between text-xs text-slate-600 mb-2">
+                <span className="font-semibold text-emerald-600">
                   {loadingStep === 1 && t("hero.step1")}
                   {loadingStep === 2 && t("hero.step2")}
                   {loadingStep === 3 && t("hero.step3")}
                 </span>
-                <span className="font-mono text-slate-500">
+                <span className="font-mono text-slate-500 font-medium">
                   {loadingStep === 1 && "30%"}
                   {loadingStep === 2 && "70%"}
                   {loadingStep === 3 && "95%"}
                 </span>
               </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
                 <div
                   className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 transition-all duration-500 rounded-full"
                   style={{
@@ -209,13 +212,11 @@ export default function HeroInput({
 
           {/* Error Message */}
           {error && (
-            <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-left text-xs text-rose-300 animate-in fade-in">
-              <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+            <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-left text-xs text-rose-700 animate-in fade-in shadow-xs">
+              <AlertCircle className="h-4 w-4 shrink-0 text-rose-500" />
               <span>{error}</span>
             </div>
           )}
-
-
         </div>
       </div>
     </section>

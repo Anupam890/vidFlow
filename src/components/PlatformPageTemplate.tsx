@@ -29,7 +29,7 @@ export default function PlatformPageTemplate({
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-[#090d16]">
+    <div className="relative min-h-screen flex flex-col bg-[#f8fafc] text-slate-900">
       <div className="ambient-glow" />
       <Navbar />
 
@@ -49,13 +49,13 @@ export default function PlatformPageTemplate({
         {extractedMedia && <DownloadCard media={extractedMedia} />}
 
         {/* Platform Specific Feature Guide */}
-        <section className="py-16 border-t border-white/5 bg-[#0b101d]">
+        <section className="py-16 border-t border-slate-200/80 bg-white">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
                 Optimized Extraction
               </span>
-              <h2 className="text-2xl font-bold text-white mt-1">
+              <h2 className="text-2xl font-bold text-slate-900 mt-1">
                 How VidSnap Handles {platform.toUpperCase()} Media
               </h2>
             </div>
@@ -64,14 +64,14 @@ export default function PlatformPageTemplate({
               {tips.map((tip, idx) => (
                 <div
                   key={idx}
-                  className="rounded-2xl border border-white/5 bg-slate-900/60 p-5 backdrop-blur-sm"
+                  className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 shadow-xs transition-all hover:bg-white hover:shadow-md hover:border-emerald-300"
                 >
-                  <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold mb-2">
-                    <Sparkles className="h-4 w-4" />
+                  <div className="flex items-center gap-2 text-emerald-700 text-xs font-bold mb-2">
+                    <Sparkles className="h-4 w-4 text-emerald-600" />
                     <span>Feature {idx + 1}</span>
                   </div>
-                  <h3 className="text-sm font-bold text-white mb-2">{tip.title}</h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">{tip.desc}</p>
+                  <h3 className="text-sm font-bold text-slate-900 mb-2">{tip.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">{tip.desc}</p>
                 </div>
               ))}
             </div>
@@ -85,9 +85,9 @@ export default function PlatformPageTemplate({
         <HowItWorks />
 
         {/* Custom FAQs for this platform */}
-        <section className="py-16 bg-[#090d16] border-t border-white/5">
+        <section className="py-16 bg-slate-50/60 border-t border-slate-200/80">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold text-white text-center mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 text-center mb-8">
               Frequently Asked Questions About {platform.toUpperCase()} Downloads
             </h2>
             <div className="space-y-3">
@@ -96,21 +96,21 @@ export default function PlatformPageTemplate({
                 return (
                   <div
                     key={faq.q}
-                    className="overflow-hidden rounded-xl border border-white/5 bg-slate-900/50 backdrop-blur-sm"
+                    className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs transition-all hover:border-emerald-200"
                   >
                     <button
                       onClick={() => setOpenFaq(isOpen ? null : idx)}
-                      className="flex w-full items-center justify-between p-4 text-left text-sm font-semibold text-white hover:text-emerald-400 transition-colors"
+                      className="flex w-full items-center justify-between p-4 text-left text-sm font-semibold text-slate-900 hover:text-emerald-700 transition-colors cursor-pointer"
                     >
                       <span>{faq.q}</span>
                       <ChevronDown
                         className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${
-                          isOpen ? "rotate-180 text-emerald-400" : ""
+                          isOpen ? "rotate-180 text-emerald-600" : ""
                         }`}
                       />
                     </button>
                     {isOpen && (
-                      <div className="px-4 pb-4 text-xs leading-relaxed text-slate-400">
+                      <div className="px-4 pb-4 text-xs leading-relaxed text-slate-600 border-t border-slate-100 pt-3">
                         {faq.a}
                       </div>
                     )}

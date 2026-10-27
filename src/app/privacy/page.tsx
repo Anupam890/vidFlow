@@ -1,39 +1,38 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ShieldCheck, Lock, EyeOff, Server, HelpCircle, Mail } from "lucide-react";
+import { ShieldCheck, Lock, EyeOff, Server, Mail } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | VidSnap by 360xLabs",
+  title: "Privacy Policy | VidSnap - Operated by 360xLabs",
   description:
-    "Privacy Policy for VidSnap operated by 360xLabs. Learn how we respect your privacy with zero personal logging and anonymous downloads.",
+    "VidSnap operates with a strict zero-logging, anonymous policy. Learn how 360xLabs protects your data and privacy when using our video downloader.",
 };
 
 export default function PrivacyPolicyPage() {
   const lastUpdated = "October 2026";
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-[#090d16]">
+    <div className="relative min-h-screen flex flex-col bg-[#f8fafc] text-slate-800">
       <div className="ambient-glow" />
       <Navbar />
 
-      <main className="relative z-10 flex-1 py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-slate-300">
+      <main className="relative z-10 flex-1 py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-slate-700">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 text-xs font-medium text-emerald-400 mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 text-xs font-semibold text-emerald-700 mb-4 shadow-xs">
             <ShieldCheck className="h-4 w-4" />
             <span>360xLabs Privacy Assurance</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Privacy Policy
           </h1>
-          <p className="mt-3 text-xs sm:text-sm text-slate-400">
+          <p className="mt-3 text-xs sm:text-sm text-slate-500">
             Last Updated: {lastUpdated} • Operated by{" "}
-            <span className="text-white font-medium">360xLabs</span> (
+            <span className="text-slate-900 font-semibold">360xLabs</span> (
             <a
               href="mailto:360xlabs@gmail.com"
-              className="text-emerald-400 hover:underline"
+              className="text-emerald-600 hover:underline"
             >
               360xlabs@gmail.com
             </a>
@@ -42,36 +41,36 @@ export default function PrivacyPolicyPage() {
         </div>
 
         {/* Content Card */}
-        <div className="rounded-2xl border border-white/5 bg-slate-900/60 p-6 sm:p-10 backdrop-blur-xl shadow-2xl space-y-8 text-sm leading-relaxed">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-10 shadow-xl space-y-8 text-sm leading-relaxed">
           {/* Quick Highlight Pills */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pb-6 border-b border-white/5">
-            <div className="rounded-xl border border-white/5 bg-slate-800/40 p-3.5 flex items-center gap-3">
-              <EyeOff className="h-5 w-5 text-emerald-400 shrink-0" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pb-6 border-b border-slate-100">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 flex items-center gap-3">
+              <EyeOff className="h-5 w-5 text-emerald-600 shrink-0" />
               <div>
-                <span className="text-xs font-bold text-white block">100% Anonymous</span>
-                <span className="text-[11px] text-slate-400">No account required</span>
+                <span className="text-xs font-bold text-slate-900 block">100% Anonymous</span>
+                <span className="text-[11px] text-slate-500">No account required</span>
               </div>
             </div>
-            <div className="rounded-xl border border-white/5 bg-slate-800/40 p-3.5 flex items-center gap-3">
-              <Lock className="h-5 w-5 text-emerald-400 shrink-0" />
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 flex items-center gap-3">
+              <Lock className="h-5 w-5 text-emerald-600 shrink-0" />
               <div>
-                <span className="text-xs font-bold text-white block">No Video Logging</span>
-                <span className="text-[11px] text-slate-400">Files stream directly</span>
+                <span className="text-xs font-bold text-slate-900 block">No Video Logging</span>
+                <span className="text-[11px] text-slate-500">Files stream directly</span>
               </div>
             </div>
-            <div className="rounded-xl border border-white/5 bg-slate-800/40 p-3.5 flex items-center gap-3">
-              <Server className="h-5 w-5 text-emerald-400 shrink-0" />
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 flex items-center gap-3">
+              <Server className="h-5 w-5 text-emerald-600 shrink-0" />
               <div>
-                <span className="text-xs font-bold text-white block">Zero Cloud Storage</span>
-                <span className="text-[11px] text-slate-400">We do not store your media</span>
+                <span className="text-xs font-bold text-slate-900 block">Zero Cloud Storage</span>
+                <span className="text-[11px] text-slate-500">We do not store your media</span>
               </div>
             </div>
           </div>
 
           {/* Section 1 */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <span className="text-emerald-400 font-mono text-sm">01.</span>
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span className="text-emerald-600 font-mono text-sm">01.</span>
               Introduction & Scope
             </h2>
             <p>
@@ -84,11 +83,11 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 2 */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <span className="text-emerald-400 font-mono text-sm">02.</span>
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span className="text-emerald-600 font-mono text-sm">02.</span>
               Information We Do NOT Collect
             </h2>
-            <ul className="list-disc pl-5 space-y-1.5 text-slate-300">
+            <ul className="list-disc pl-5 space-y-1.5 text-slate-600">
               <li>
                 <strong>No User Accounts or Passwords:</strong> VidSnap requires no sign-up, user registration, email, or credentials to download videos or view public content.
               </li>
@@ -103,8 +102,8 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 3 */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <span className="text-emerald-400 font-mono text-sm">03.</span>
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span className="text-emerald-600 font-mono text-sm">03.</span>
               Information We Process Temporarily
             </h2>
             <p>
@@ -117,8 +116,8 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 4 */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <span className="text-emerald-400 font-mono text-sm">04.</span>
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span className="text-emerald-600 font-mono text-sm">04.</span>
               Cookies & Local Storage
             </h2>
             <p>
@@ -128,8 +127,8 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 5 */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <span className="text-emerald-400 font-mono text-sm">05.</span>
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span className="text-emerald-600 font-mono text-sm">05.</span>
               Third-Party Content & Platforms
             </h2>
             <p>
@@ -139,8 +138,8 @@ export default function PrivacyPolicyPage() {
 
           {/* Section 6 */}
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <span className="text-emerald-400 font-mono text-sm">06.</span>
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span className="text-emerald-600 font-mono text-sm">06.</span>
               Data Protection Rights (GDPR & CCPA)
             </h2>
             <p>
@@ -149,20 +148,20 @@ export default function PrivacyPolicyPage() {
           </section>
 
           {/* Section 7 */}
-          <section className="space-y-3 pt-4 border-t border-white/5">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <span className="text-emerald-400 font-mono text-sm">07.</span>
+          <section className="space-y-3 pt-4 border-t border-slate-100">
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span className="text-emerald-600 font-mono text-sm">07.</span>
               Contact & Inquiries
             </h2>
             <p>
               If you have any questions, security notices, or privacy inquiries regarding VidSnap, please contact the <strong>360xLabs</strong> team directly:
             </p>
-            <div className="mt-3 inline-flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-xs font-semibold text-emerald-300">
-              <Mail className="h-4 w-4 text-emerald-400" />
+            <div className="mt-3 inline-flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-xs font-semibold text-emerald-800 shadow-xs">
+              <Mail className="h-4 w-4 text-emerald-600" />
               <span>Official Email:</span>
               <a
                 href="mailto:360xlabs@gmail.com"
-                className="text-white hover:underline font-mono"
+                className="text-emerald-700 hover:underline font-mono font-bold"
               >
                 360xlabs@gmail.com
               </a>

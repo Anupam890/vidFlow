@@ -38,17 +38,17 @@ export default function Faq() {
   ];
 
   return (
-    <section className="relative py-20 bg-[#090d16] border-t border-white/5">
+    <section className="relative py-20 bg-white border-t border-slate-200/80">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 mb-3">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 mb-3 shadow-xs">
             <HelpCircle className="h-3.5 w-3.5" />
             <span>Got Questions?</span>
           </div>
-          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+          <h2 className="text-3xl font-extrabold text-slate-900 sm:text-4xl">
             Frequently Asked Questions
           </h2>
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-slate-500">
             Everything you need to know about formats, audio syncing, and usage.
           </p>
         </div>
@@ -59,22 +59,21 @@ export default function Faq() {
             return (
               <div
                 key={faq.q}
-                className="overflow-hidden rounded-xl border border-white/5 bg-slate-900/50 backdrop-blur-sm transition-all"
+                className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70 transition-all hover:border-emerald-200"
               >
                 <button
                   onClick={() => setOpenIndex(isOpen ? null : idx)}
-                  className="flex w-full items-center justify-between p-4 text-left text-sm font-semibold text-white hover:text-emerald-400 transition-colors"
+                  className="flex w-full items-center justify-between p-4 text-left text-sm font-semibold text-slate-900 hover:text-emerald-700 transition-colors cursor-pointer"
                 >
                   <span>{faq.q}</span>
                   <ChevronDown
-                    className={`h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 ${
-                      isOpen ? "rotate-180 text-emerald-400" : ""
+                    className={`h-4 w-4 shrink-0 text-slate-400 transition-transform ${
+                      isOpen ? "rotate-180 text-emerald-600" : ""
                     }`}
                   />
                 </button>
-
                 {isOpen && (
-                  <div className="px-4 pb-4 text-xs leading-relaxed text-slate-400 animate-in fade-in duration-150">
+                  <div className="px-4 pb-4 text-xs leading-relaxed text-slate-600 border-t border-slate-100 pt-3">
                     {faq.a}
                   </div>
                 )}

@@ -19,6 +19,8 @@ export interface MediaFormat {
   hasVideo: boolean;
   formatNote?: string;
   url?: string;
+  qualityRank?: number;
+  isTranscode?: boolean;
 }
 
 export interface ExtractedMedia {

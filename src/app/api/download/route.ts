@@ -10,6 +10,8 @@ export async function GET(req: NextRequest) {
   const audioOnly = searchParams.get("audio") === "true";
   const rawTitle = searchParams.get("title") || "video";
   const rawExt = searchParams.get("ext") || (audioOnly ? "mp3" : "mp4");
+  const rawBranding = searchParams.get("branding") || "VidSnap";
+  const rawQuality = searchParams.get("quality") || (audioOnly ? "audio" : "HD");
 
   if (!targetUrl) {
     return new Response(JSON.stringify({ error: "Missing 'url' parameter." }), {
@@ -18,33 +20,38 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // Sanitize filename for Content-Disposition header (RFC 6266 & RFC 5987)
-  // 1. Unicode title for modern browsers via filename*=UTF-8''
-  const safeUnicodeTitle = rawTitle
+  // Format: branding_name_video_name_resolution_format
+  // e.g. VidSnap_Never_Gonna_Give_You_Up_1080p.mp4
+  const cleanBranding = rawBranding
+    .replace(/[^\w-]/g, "")
+    .trim() || "VidSnap";
+
+  const cleanTitle = rawTitle
     .replace(/[\r\n\t]/g, " ")
-    .replace(/[\\/:*?"<>|]/g, "_")
-    .replace(/\s+/g, " ")
+    .replace(/[\\/:*?"<>|#%&{}\\<>*?/$!'":@+`|=]/g, "")
     .trim()
-    .slice(0, 100) || "video";
-  const utf8Filename = `${safeUnicodeTitle}.${rawExt}`;
-  const encodedUtf8Filename = encodeURIComponent(utf8Filename).replace(
+    .replace(/\s+/g, "_")
+    .slice(0, 60) || "video";
+
+  const cleanQuality = rawQuality
+    .replace(/[^\w-]/g, "")
+    .trim() || (audioOnly ? "audio" : "HD");
+
+  const fullFilename = `${cleanBranding}_${cleanTitle}_${cleanQuality}.${rawExt}`;
+
+  // Strict ASCII fallback for legacy filename="..." parameter
+  const asciiFilename = fullFilename.replace(/[^\x20-\x7E]/g, "_");
+  const encodedUtf8Filename = encodeURIComponent(fullFilename).replace(
     /['()*]/g,
     (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
   );
-
-  // 2. Strict ASCII fallback for legacy filename="..." parameter (ByteString requires char code <= 255)
-  const asciiOnlyTitle = safeUnicodeTitle
-    .replace(/[^\x20-\x7E]/g, "")
-    .replace(/["\\]/g, "")
-    .trim()
-    .slice(0, 80) || "video";
-  const asciiFilename = `${asciiOnlyTitle}.${rawExt}`;
 
   try {
     const { filePath, cleanup, size } = await prepareMediaFile(targetUrl, {
       formatId,
       audioOnly,
       ext: rawExt,
+      quality: rawQuality,
     });
 
     const nodeStream = fs.createReadStream(filePath);
@@ -56,9 +63,19 @@ export async function GET(req: NextRequest) {
     req.signal.addEventListener("abort", cleanup);
 
     const contentType = audioOnly
-      ? "audio/mpeg"
+      ? rawExt === "m4a"
+        ? "audio/mp4"
+        : rawExt === "wav"
+        ? "audio/wav"
+        : rawExt === "flac"
+        ? "audio/flac"
+        : rawExt === "aac"
+        ? "audio/aac"
+        : "audio/mpeg"
       : rawExt === "webm"
       ? "video/webm"
+      : rawExt === "mkv"
+      ? "video/x-matroska"
       : "video/mp4";
 
     return new Response(webStream as any, {

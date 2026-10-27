@@ -15,7 +15,7 @@ export default function Home() {
   const [extractedMedia, setExtractedMedia] = useState<ExtractedMedia | null>(null);
 
   return (
-    <div className="relative min-h-screen flex flex-col bg-[#090d16]">
+    <div className="relative min-h-screen flex flex-col bg-[#f8fafc] text-slate-900">
       {/* Background ambient lighting */}
       <div className="ambient-glow" />
 

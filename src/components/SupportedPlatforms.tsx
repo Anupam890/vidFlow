@@ -18,90 +18,83 @@ export default function SupportedPlatforms() {
   const platforms = [
     {
       name: "YouTube Downloader",
-      slug: "/youtube",
+      slug: "/yt",
       desc: "Download YouTube videos in 4K, 1080p, Shorts, and extract MP3 audio directly.",
       badge: "4K & 1080p",
-      badgeColor: "bg-red-500/10 text-red-400 border-red-500/20",
-      borderGlow: "hover:border-red-500/40",
+      badgeColor: "bg-red-50 text-red-700 border-red-200",
+      borderGlow: "hover:border-red-400 hover:shadow-red-500/10",
       tag: "Videos & Shorts",
       icon: YoutubeIcon,
-      iconColor: "text-red-500",
+      iconColor: "text-red-600",
     },
     {
       name: "TikTok Downloader",
-      slug: "/tiktok",
+      slug: "/tt",
       desc: "Save TikTok videos without watermark in HD MP4 or extract original sounds to MP3.",
       badge: "No Watermark",
-      badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-      borderGlow: "hover:border-cyan-500/40",
+      badgeColor: "bg-cyan-50 text-cyan-700 border-cyan-200",
+      borderGlow: "hover:border-cyan-400 hover:shadow-cyan-500/10",
       tag: "Watermark Free",
       icon: TikTokIcon,
-      iconColor: "text-cyan-400",
+      iconColor: "text-cyan-600",
     },
     {
-      name: "Instagram Downloader",
-      slug: "/instagram",
-      desc: "Download Instagram Reels, carousel multi-photos, profile media, story highlights, and anonymous story viewer.",
-      badge: "Reels & Stories",
-      badgeColor: "bg-pink-500/10 text-pink-400 border-pink-500/20",
-      borderGlow: "hover:border-pink-500/40",
-      tag: "HD Quality",
+      name: "Instagram Video Downloader",
+      slug: "/ig",
+      desc: "Download Instagram Reels and videos in high-definition 1080p MP4 with crystal-clear audio.",
+      badge: "Reels & Videos",
+      badgeColor: "bg-pink-50 text-pink-700 border-pink-200",
+      borderGlow: "hover:border-pink-400 hover:shadow-pink-500/10",
+      tag: "1080p MP4",
       icon: InstagramIcon,
-      iconColor: "text-pink-500",
-      sublinks: [
-        { name: "Story Viewer", href: "/instagram/viewer" },
-        { name: "Reels", href: "/instagram/reels" },
-        { name: "Stories", href: "/instagram/story" },
-        { name: "Photos", href: "/instagram/photo" },
-        { name: "Carousels", href: "/instagram/carousel" },
-      ],
+      iconColor: "text-pink-600",
     },
     {
       name: "Twitter / X Downloader",
-      slug: "/twitter",
+      slug: "/tw",
       desc: "Save viral X (Twitter) clips, news videos, and animated GIFs in high resolution.",
       badge: "GIF & Video",
-      badgeColor: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-      borderGlow: "hover:border-sky-500/40",
+      badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
+      borderGlow: "hover:border-sky-400 hover:shadow-sky-500/10",
       tag: "Fast Parsing",
       icon: TwitterXIcon,
-      iconColor: "text-white",
+      iconColor: "text-slate-900",
     },
     {
       name: "Reddit Video Downloader",
-      slug: "/reddit",
+      slug: "/rd",
       desc: "Downloads Reddit video posts with audio automatically merged into a clean MP4 file.",
       badge: "Audio Merged",
-      badgeColor: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-      borderGlow: "hover:border-orange-500/40",
+      badgeColor: "bg-orange-50 text-orange-700 border-orange-200",
+      borderGlow: "hover:border-orange-400 hover:shadow-orange-500/10",
       tag: "Sound Synced",
       icon: RedditIcon,
-      iconColor: "text-orange-500",
+      iconColor: "text-orange-600",
     },
     {
       name: "Pinterest Downloader",
-      slug: "/pinterest",
+      slug: "/pin",
       desc: "Save aesthetic pins, creative video ideas, and looping animations in original quality.",
       badge: "Pins & GIFs",
-      badgeColor: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-      borderGlow: "hover:border-rose-500/40",
+      badgeColor: "bg-rose-50 text-rose-700 border-rose-200",
+      borderGlow: "hover:border-rose-400 hover:shadow-rose-500/10",
       tag: "Original Size",
       icon: PinterestIcon,
-      iconColor: "text-rose-500",
+      iconColor: "text-rose-600",
     },
   ];
 
   return (
-    <section className="relative py-20 bg-[#090d16]">
+    <section className="relative py-20 bg-slate-50/60 border-t border-slate-200/80">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-emerald-400 mb-2">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-2">
             {t("platforms.hub")}
           </h2>
-          <p className="text-3xl font-extrabold text-white sm:text-4xl">
+          <p className="text-3xl font-extrabold text-slate-900 sm:text-4xl">
             {t("platforms.title")}
           </p>
-          <p className="mt-3 text-sm text-slate-400">
+          <p className="mt-3 text-sm text-slate-600">
             {t("platforms.subtitle")}
           </p>
         </div>
@@ -113,12 +106,12 @@ export default function SupportedPlatforms() {
               <Link
                 key={p.slug}
                 href={p.slug}
-                className={`group relative rounded-2xl border border-white/5 bg-slate-900/50 p-6 backdrop-blur-sm transition-all duration-200 hover:-translate-y-1 hover:bg-slate-900/90 ${p.borderGlow}`}
+                className={`group relative rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${p.borderGlow}`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 border border-white/5">
-                      <Icon className={`h-4 w-4 ${p.iconColor}`} />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 border border-slate-200">
+                      <Icon className={`h-5 w-5 ${p.iconColor}`} />
                     </div>
                     <span
                       className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold border ${p.badgeColor}`}
@@ -127,33 +120,20 @@ export default function SupportedPlatforms() {
                     </span>
                   </div>
 
-                  <span className="text-xs text-slate-500 group-hover:text-emerald-400 transition-colors flex items-center gap-1 font-medium">
+                  <span className="text-xs text-slate-400 group-hover:text-emerald-600 transition-colors flex items-center gap-1 font-semibold">
                     {t("platforms.open")} <ArrowRight className="h-3 w-3" />
                   </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-emerald-600 transition-colors">
                   {p.name}
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                <p className="text-xs text-slate-600 leading-relaxed mb-4">
                   {p.desc}
                 </p>
 
-                {p.sublinks && (
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {p.sublinks.map((sub) => (
-                      <span
-                        key={sub.name}
-                        className="rounded-lg bg-pink-500/10 border border-pink-500/20 px-2 py-0.5 text-[10px] font-medium text-pink-300"
-                      >
-                        {sub.name}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex items-center gap-2 pt-3 border-t border-white/5 text-[11px] text-slate-500 font-medium">
-                  <Sparkles className="h-3 w-3 text-emerald-400" />
+                <div className="flex items-center gap-2 pt-3 border-t border-slate-100 text-[11px] text-slate-500 font-medium">
+                  <Sparkles className="h-3.5 w-3.5 text-emerald-500" />
                   <span>Supports: {p.tag}</span>
                 </div>
               </Link>

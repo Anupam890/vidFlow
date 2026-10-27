@@ -49,17 +49,17 @@ export default function LanguageSelector({ isMobile = false }: LanguageSelectorP
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="group flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs font-medium text-slate-300 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-emerald-400 cursor-pointer"
+        className="group flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-100/80 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition-all hover:border-emerald-300 hover:bg-white hover:text-emerald-700 shadow-xs cursor-pointer"
         title="Select Language"
       >
-        <Globe className="h-3.5 w-3.5 text-emerald-400 transition-transform group-hover:rotate-12" />
+        <Globe className="h-3.5 w-3.5 text-emerald-600 transition-transform group-hover:rotate-12" />
         <span className="hidden sm:inline">{currentLangInfo.nativeName}</span>
         <span className="sm:hidden font-mono uppercase text-[11px]">
           {currentLangInfo.code}
         </span>
         <ChevronDown
           className={`h-3 w-3 text-slate-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180 text-emerald-400" : ""
+            isOpen ? "rotate-180 text-emerald-600" : ""
           }`}
         />
       </button>
@@ -68,12 +68,12 @@ export default function LanguageSelector({ isMobile = false }: LanguageSelectorP
         <div
           className={`absolute ${
             isMobile ? "right-0" : "right-0"
-          } top-full mt-2 w-64 rounded-2xl border border-white/10 bg-[#0b1020]/95 p-2.5 shadow-2xl backdrop-blur-2xl ring-1 ring-black/50 z-50 animate-in fade-in slide-in-from-top-2 duration-150`}
+          } top-full mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2.5 shadow-2xl ring-1 ring-black/5 z-50 animate-in fade-in slide-in-from-top-2 duration-150`}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-2 pb-2 mb-1.5 border-b border-white/5">
-            <span className="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
-              <Globe className="h-3.5 w-3.5 text-emerald-400" />
+          <div className="flex items-center justify-between px-2 pb-2 mb-1.5 border-b border-slate-100">
+            <span className="text-xs font-bold text-slate-900 tracking-wide flex items-center gap-1.5">
+              <Globe className="h-3.5 w-3.5 text-emerald-600" />
               Choose Language
             </span>
             <span className="text-[10px] text-slate-400 font-mono">
@@ -88,7 +88,7 @@ export default function LanguageSelector({ isMobile = false }: LanguageSelectorP
               placeholder="Search language..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-slate-900/80 px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50"
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500"
             />
           </div>
 
@@ -103,21 +103,21 @@ export default function LanguageSelector({ isMobile = false }: LanguageSelectorP
                   onClick={() => handleSelect(lang)}
                   className={`w-full flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-colors cursor-pointer ${
                     isSelected
-                      ? "bg-emerald-500/15 text-emerald-300 font-medium border border-emerald-500/30"
-                      : "text-slate-300 hover:bg-white/5 hover:text-white"
+                      ? "bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200"
+                      : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-sm">{lang.flag}</span>
                     <span className="font-medium">{lang.nativeName}</span>
                     {lang.name !== lang.nativeName && (
-                      <span className="text-[11px] text-slate-500">
+                      <span className="text-[11px] text-slate-400">
                         ({lang.name})
                       </span>
                     )}
                   </div>
                   {isSelected && (
-                    <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                    <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
                   )}
                 </button>
               );
@@ -125,7 +125,7 @@ export default function LanguageSelector({ isMobile = false }: LanguageSelectorP
           </div>
 
           {/* Footer note */}
-          <div className="mt-2 pt-2 border-t border-white/5 px-2 text-[10px] text-slate-500 text-center">
+          <div className="mt-2 pt-2 border-t border-slate-100 px-2 text-[10px] text-slate-400 text-center">
             Select your preferred display language
           </div>
         </div>

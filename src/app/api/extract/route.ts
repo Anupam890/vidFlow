@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { extractMediaInfo } from "@/lib/extractor";
+import { extractMediaInfo, prepareMediaFile } from "@/lib/extractor";
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,6 +32,19 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await extractMediaInfo(trimmedUrl);
+
+    // High-speed background preheat: asynchronously prepare the top format so user clicks enjoy instant 0ms download
+    if (data && data.videos && data.videos.length > 0) {
+      const topVideo = data.videos[0];
+      prepareMediaFile(trimmedUrl, {
+        formatId: topVideo.id,
+        ext: topVideo.ext || "mp4",
+        quality: topVideo.quality,
+      }).catch((e) => {
+        console.warn("Background preheat notice:", e?.message);
+      });
+    }
+
     return NextResponse.json({ success: true, data });
   } catch (err: any) {
     console.error("API /api/extract error:", err);
