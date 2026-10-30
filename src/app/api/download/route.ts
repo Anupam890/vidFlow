@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { prepareMediaFile } from "@/lib/extractor";
+import { runLimited, TooBusyError } from "@/lib/limiter";
 import fs from "fs";
 import { Readable } from "stream";
 
@@ -47,12 +48,16 @@ export async function GET(req: NextRequest) {
   );
 
   try {
-    const { filePath, cleanup, size } = await prepareMediaFile(targetUrl, {
-      formatId,
-      audioOnly,
-      ext: rawExt,
-      quality: rawQuality,
-    });
+    // Only the preparation is rate limited; the byte streaming below is IO
+    // bound and must not hold a slot while the client downloads.
+    const { filePath, cleanup, size } = await runLimited(() =>
+      prepareMediaFile(targetUrl, {
+        formatId,
+        audioOnly,
+        ext: rawExt,
+        quality: rawQuality,
+      })
+    );
 
     const nodeStream = fs.createReadStream(filePath);
     const webStream = Readable.toWeb(nodeStream as any);
@@ -89,6 +94,12 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error: any) {
+    if (error instanceof TooBusyError) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 503,
+        headers: { "Content-Type": "application/json", "Retry-After": "10" },
+      });
+    }
     console.error("Download streaming error:", error);
     return new Response(
       JSON.stringify({ error: error?.message || "Download processing failed." }),

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { extractMediaInfo, prepareMediaFile } from "@/lib/extractor";
+import { extractMediaInfo } from "@/lib/extractor";
+import { runLimited, TooBusyError } from "@/lib/limiter";
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,22 +32,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const data = await extractMediaInfo(trimmedUrl);
+    const data = await runLimited(() => extractMediaInfo(trimmedUrl));
 
-    // High-speed background preheat: asynchronously prepare the top format so user clicks enjoy instant 0ms download
-    if (data && data.videos && data.videos.length > 0) {
-      const topVideo = data.videos[0];
-      prepareMediaFile(trimmedUrl, {
-        formatId: topVideo.id,
-        ext: topVideo.ext || "mp4",
-        quality: topVideo.quality,
-      }).catch((e) => {
-        console.warn("Background preheat notice:", e?.message);
-      });
-    }
+    // No background preheat: downloading and muxing the top format on every
+    // paste doubled CPU and bandwidth, including for visitors who never
+    // clicked Download. The work now happens only in /api/download.
 
     return NextResponse.json({ success: true, data });
   } catch (err: any) {
+    if (err instanceof TooBusyError) {
+      return NextResponse.json({ error: err.message }, { status: 503 });
+    }
     console.error("API /api/extract error:", err);
     return NextResponse.json(
       {

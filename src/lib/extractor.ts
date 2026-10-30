@@ -31,6 +31,24 @@ try {
   if (!fs.existsSync(PREPARED_DIR)) fs.mkdirSync(PREPARED_DIR, { recursive: true });
 } catch {}
 
+// Re-encoding is the most expensive thing this server does. Anything above
+// these limits is refused rather than allowed to monopolise the machine.
+const MAX_TRANSCODE_HEIGHT = Number(process.env.MAX_TRANSCODE_HEIGHT || 720);
+const MAX_TRANSCODE_SECONDS = Number(process.env.MAX_TRANSCODE_SECONDS || 600);
+
+const FFMPEG_LOW_PRIORITY = process.platform !== "win32";
+
+/**
+ * Runs ffmpeg pinned to a single thread and at low CPU priority, so a long
+ * transcode cannot starve the web server on a small box.
+ */
+function runFfmpeg(args: string[]) {
+  const throttled = ["-threads", "1", "-filter_threads", "1", ...args];
+  return FFMPEG_LOW_PRIORITY
+    ? execFileAsync("nice", ["-n", "15", "ffmpeg", ...throttled], { env: process.env })
+    : execFileAsync("ffmpeg", throttled, { env: process.env });
+}
+
 function getCacheKey(url: string): string {
   const clean = (url || "").trim().toLowerCase().replace(/\/$/, "");
   return crypto.createHash("md5").update(clean).digest("hex");
@@ -298,19 +316,6 @@ async function extractTikTokWithTikWM(targetUrl: string): Promise<ExtractedMedia
           qualityRank: 1080,
         },
         {
-          id: d.hdplay ? "scale:1080:webm" : "scale:720:webm",
-          quality: "1080p Full HD",
-          ext: "webm",
-          resolution: "1080x1920",
-          filesize: Math.round(baseSize * 0.88),
-          filesizeApprox: Math.round(baseSize * 0.88),
-          hasAudio: true,
-          hasVideo: true,
-          url: d.hdplay || d.play,
-          qualityRank: 1080,
-          isTranscode: true,
-        },
-        {
           id: "nowm",
           quality: "720p HD",
           ext: "mp4",
@@ -321,18 +326,6 @@ async function extractTikTokWithTikWM(targetUrl: string): Promise<ExtractedMedia
           hasVideo: true,
           url: d.play,
           qualityRank: 720,
-        },
-        {
-          id: "scale:720:webm",
-          quality: "720p HD",
-          ext: "webm",
-          resolution: "720x1280",
-          filesize: Math.round((d.size || baseSize * 0.65) * 0.88),
-          filesizeApprox: Math.round((d.size || baseSize * 0.65) * 0.88),
-          hasAudio: true,
-          hasVideo: true,
-          qualityRank: 720,
-          isTranscode: true,
         },
         {
           id: "scale:480:mp4",
@@ -347,36 +340,12 @@ async function extractTikTokWithTikWM(targetUrl: string): Promise<ExtractedMedia
           isTranscode: true,
         },
         {
-          id: "scale:480:webm",
-          quality: "480p",
-          ext: "webm",
-          resolution: "480x854",
-          filesize: Math.round(baseSize * 0.33),
-          filesizeApprox: Math.round(baseSize * 0.33),
-          hasAudio: true,
-          hasVideo: true,
-          qualityRank: 480,
-          isTranscode: true,
-        },
-        {
           id: "scale:360:mp4",
           quality: "360p",
           ext: "mp4",
           resolution: "360x640",
           filesize: Math.round(baseSize * 0.24),
           filesizeApprox: Math.round(baseSize * 0.24),
-          hasAudio: true,
-          hasVideo: true,
-          qualityRank: 360,
-          isTranscode: true,
-        },
-        {
-          id: "scale:360:webm",
-          quality: "360p",
-          ext: "webm",
-          resolution: "360x640",
-          filesize: Math.round(baseSize * 0.21),
-          filesizeApprox: Math.round(baseSize * 0.21),
           hasAudio: true,
           hasVideo: true,
           qualityRank: 360,
@@ -567,31 +536,33 @@ export async function extractMediaInfo(targetUrl: string): Promise<ExtractedMedi
       { label: "360p", rank: 360, res: "640x360", ratio: 0.24 },
     ];
 
+    // Only synthesise MP4 tiers. A missing tier has to be re-encoded on demand,
+    // and VP9/WebM encoding is far too expensive for a small shared box — a
+    // single clip can occupy every core for longer than the video itself runs.
     const effectiveMaxRank = maxQualityRank > 0 ? maxQualityRank : 1080;
     for (const tier of standardTiers) {
-      if (tier.rank <= effectiveMaxRank) {
-        for (const ext of ["mp4", "webm"]) {
-          const key = `${tier.label}_${ext}`;
-          if (!formatMap.has(key)) {
-            const estBytes = baseRefSize > 0
-              ? Math.round(baseRefSize * tier.ratio * (ext === "webm" ? 0.88 : 1.0))
-              : Math.round(((estimateBitrateByHeight(tier.rank) + 128) * 1000 / 8) * (duration || 180));
+      if (tier.rank > effectiveMaxRank) continue;
+      if (tier.rank > MAX_TRANSCODE_HEIGHT) continue;
 
-            formatMap.set(key, {
-              id: `scale:${tier.rank}:${ext}`,
-              ext,
-              quality: tier.label,
-              resolution: tier.res,
-              filesize: estBytes,
-              filesizeApprox: estBytes,
-              hasAudio: true,
-              hasVideo: true,
-              qualityRank: tier.rank,
-              isTranscode: true,
-            });
-          }
-        }
-      }
+      const key = `${tier.label}_mp4`;
+      if (formatMap.has(key)) continue;
+
+      const estBytes = baseRefSize > 0
+        ? Math.round(baseRefSize * tier.ratio)
+        : Math.round(((estimateBitrateByHeight(tier.rank) + 128) * 1000 / 8) * (duration || 180));
+
+      formatMap.set(key, {
+        id: `scale:${tier.rank}:mp4`,
+        ext: "mp4",
+        quality: tier.label,
+        resolution: tier.res,
+        filesize: estBytes,
+        filesizeApprox: estBytes,
+        hasAudio: true,
+        hasVideo: true,
+        qualityRank: tier.rank,
+        isTranscode: true,
+      });
     }
 
     // 4. Sort video formats logically: highest resolution first, with MP4 placed ahead of WEBM
@@ -655,6 +626,23 @@ export async function prepareMediaFile(
     quality?: string;
   }
 ): Promise<{ filePath: string; cleanup: () => void; size: number }> {
+  // VP9/WebM encoding is an order of magnitude slower than realtime here, and
+  // no WebM option is offered any more — reject hand-crafted requests for it.
+  if (options.ext === "webm") {
+    throw new Error("WebM output is not available. Please choose an MP4 format.");
+  }
+
+  // Refuse re-encodes that would tie up the box for longer than they are worth.
+  if (options.formatId?.startsWith("scale:")) {
+    const targetHeight = parseInt(options.formatId.split(":")[1]) || 720;
+    const cachedDuration = getCachedMedia(targetUrl)?.duration || 0;
+    if (targetHeight > MAX_TRANSCODE_HEIGHT || cachedDuration > MAX_TRANSCODE_SECONDS) {
+      throw new Error(
+        "This quality needs re-encoding, which is disabled for long or high-resolution videos. Please pick one of the native formats instead."
+      );
+    }
+  }
+
   const cacheKey = getCacheKey(targetUrl);
   const targetExt = options.ext || (options.audioOnly ? "mp3" : "mp4");
   const cleanFormatId = (options.formatId || (options.audioOnly ? "audio" : "best")).replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -695,7 +683,7 @@ export async function prepareMediaFile(
           fs.writeFileSync(rawTempAudio, Buffer.from(await streamRes.arrayBuffer()));
           const audioBitrate = options.quality?.replace(/[^\d]/g, "") || "320";
           try {
-            await execFileAsync("ffmpeg", [
+            await runFfmpeg([
               "-y",
               "-i", rawTempAudio,
               "-vn",
@@ -745,7 +733,7 @@ export async function prepareMediaFile(
             }
             ffmpegArgs.push(finalPath);
 
-            await execFileAsync("ffmpeg", ffmpegArgs);
+            await runFfmpeg(ffmpegArgs);
             try { if (fs.existsSync(rawVideo)) fs.unlinkSync(rawVideo); } catch {}
             const stat = fs.statSync(finalPath);
             return { filePath: finalPath, cleanup: () => {}, size: stat.size };
@@ -797,7 +785,7 @@ export async function prepareMediaFile(
             ffmpegArgs.push("-c:a", "aac", "-b:a", `${audioBitrate}k`);
           }
           ffmpegArgs.push(finalPath);
-          await execFileAsync("ffmpeg", ffmpegArgs);
+          await runFfmpeg(ffmpegArgs);
           const stat = fs.statSync(finalPath);
           return { filePath: finalPath, cleanup: () => {}, size: stat.size };
         }
@@ -825,7 +813,7 @@ export async function prepareMediaFile(
             "-movflags", "+faststart",
             finalPath
           );
-          await execFileAsync("ffmpeg", ffmpegArgs);
+          await runFfmpeg(ffmpegArgs);
           const stat = fs.statSync(finalPath);
           return { filePath: finalPath, cleanup: () => {}, size: stat.size };
         }
@@ -839,7 +827,7 @@ export async function prepareMediaFile(
           // If stream already contains audio (progressive)
           if (fVideo.acodec && fVideo.acodec !== "none") {
             const ffmpegArgs = ["-y", "-i", fVideo.url, "-c", "copy", "-movflags", "+faststart", finalPath];
-            await execFileAsync("ffmpeg", ffmpegArgs);
+            await runFfmpeg(ffmpegArgs);
             const stat = fs.statSync(finalPath);
             return { filePath: finalPath, cleanup: () => {}, size: stat.size };
           }
@@ -853,7 +841,7 @@ export async function prepareMediaFile(
               "-movflags", "+faststart",
               finalPath,
             ];
-            await execFileAsync("ffmpeg", ffmpegArgs);
+            await runFfmpeg(ffmpegArgs);
             const stat = fs.statSync(finalPath);
             return { filePath: finalPath, cleanup: () => {}, size: stat.size };
           }
