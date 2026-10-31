@@ -30,8 +30,8 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "VidSnap | Fast Online Video & Audio Downloader (4K & MP3)",
-    template: "%s | VidSnap",
+    default: "vidsnap.tech - all type of downloader",
+    template: "%s | vidsnap.tech - all type of downloader",
   },
   description:
     "Free, 100% watermark-free online video downloader for YouTube, TikTok, Instagram, Twitter/X, Reddit, and Pinterest. Save in 4K, 1080p Full HD, or convert to 320kbps MP3.",
@@ -89,7 +89,11 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon", sizes: "64x64", type: "image/png" },
+    ],
+    apple: "/apple-icon",
   },
 };
 
@@ -104,6 +108,8 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-icon" />
         <JsonLd data={getWebSiteSchema()} />
         <JsonLd data={getSoftwareApplicationSchema()} />
         <JsonLd data={getOrganizationSchema()} />

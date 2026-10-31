@@ -32,30 +32,41 @@ export default async function Image() {
         >
           <div
             style={{
-              width: "72px",
-              height: "72px",
+              width: "76px",
+              height: "76px",
               borderRadius: "20px",
-              background: "#059669",
+              background: "#ffffff",
+              border: "4px solid #10b981",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 10px 25px -5px rgba(5, 150, 105, 0.5)",
-              color: "white",
-              fontSize: "36px",
-              fontWeight: 800,
+              boxShadow: "0 10px 25px -5px rgba(16, 185, 129, 0.4)",
             }}
           >
-            ⚡
+            <svg
+              width="44"
+              height="44"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#059669"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+              <path d="M12 12v8" />
+              <path d="m8 16 4 4 4-4" />
+            </svg>
           </div>
           <span
             style={{
-              fontSize: "68px",
+              fontSize: "64px",
               fontWeight: 900,
               letterSpacing: "-0.04em",
               color: "#ffffff",
             }}
           >
-            Vid<span style={{ color: "#34d399" }}>Snap</span>
+            vidsnap<span style={{ color: "#34d399" }}>.tech</span>
           </span>
         </div>
 
@@ -72,7 +83,7 @@ export default async function Image() {
             letterSpacing: "-0.02em",
           }}
         >
-          Fast Online Video & Audio Downloader
+          All Type of Downloader - Fast Online Video & Audio Saver
         </div>
 
         {/* Sub-tagline */}

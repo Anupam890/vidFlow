@@ -1,5 +1,5 @@
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://vidsnap.com";
-export const SITE_NAME = "VidSnap";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://vidsnap.tech";
+export const SITE_NAME = "vidsnap.tech - all type of downloader";
 
 export interface FaqItem {
   q: string;

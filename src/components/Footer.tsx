@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { DownloadCloud } from "lucide-react";
+import BrandLogo from "./BrandLogo";
 import { useTranslation } from "@/context/LanguageContext";
 
 export default function Footer() {
@@ -13,13 +13,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand Col */}
           <div className="space-y-3 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-white font-bold shadow-xs">
-                <DownloadCloud className="h-4 w-4" />
-              </div>
-              <span className="text-lg font-bold text-slate-900 tracking-tight">
-                Vid<span className="text-emerald-600">Snap</span>
-              </span>
+            <Link href="/" className="inline-flex items-center">
+              <BrandLogo size={36} showText={true} />
             </Link>
             <p className="text-xs text-slate-500 leading-relaxed">
               {t("footer.desc")}
