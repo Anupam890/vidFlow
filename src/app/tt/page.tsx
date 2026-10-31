@@ -2,9 +2,34 @@ import PlatformPageTemplate from "@/components/PlatformPageTemplate";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "TikTok Video Downloader Without Watermark | VidSnap",
+  title: "TikTok Video Downloader Without Watermark",
   description:
-    "Download TikTok videos without watermark in HD MP4 or extract original audio sounds to MP3. Free, fast and unlimited.",
+    "Download TikTok videos without watermark in HD MP4 or extract original audio sounds to MP3. 100% free, fast, and unlimited.",
+  keywords: [
+    "tiktok downloader without watermark",
+    "tiktok video download no watermark",
+    "save tiktok mp4",
+    "tiktok audio extractor mp3",
+    "snaptik alternative",
+    "download tiktok sound",
+    "tiktok full hd video saver",
+  ],
+  alternates: {
+    canonical: "/tt",
+  },
+  openGraph: {
+    title: "TikTok Video Downloader Without Watermark | VidSnap",
+    description:
+      "Save clean, watermark-free TikTok videos in high definition MP4 format. Extract trending sounds to MP3.",
+    url: "/tt",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TikTok Video Downloader Without Watermark | VidSnap",
+    description:
+      "Download clean TikTok videos with no logos or watermark in full HD quality.",
+  },
 };
 
 export default function TikTokPage() {

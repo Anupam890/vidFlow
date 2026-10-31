@@ -2,9 +2,34 @@ import PlatformPageTemplate from "@/components/PlatformPageTemplate";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "YouTube Video Downloader - 4K, 1080p & MP3 | VidSnap",
+  title: "YouTube Video Downloader - 4K, 1080p & MP3",
   description:
-    "Free online YouTube video downloader. Download YouTube videos in 4K, 1080p, 720p HD with sound or convert to 320kbps MP3 audio.",
+    "Free online YouTube video downloader. Download YouTube videos and Shorts in 4K, 1080p, 720p HD with sound or extract 320kbps MP3 audio.",
+  keywords: [
+    "youtube video downloader",
+    "youtube 4k downloader",
+    "youtube 1080p downloader with audio",
+    "youtube shorts downloader",
+    "youtube to mp3 320kbps",
+    "download youtube video online",
+    "free youtube downloader",
+  ],
+  alternates: {
+    canonical: "/yt",
+  },
+  openGraph: {
+    title: "YouTube Video Downloader - 4K, 1080p & MP3 | VidSnap",
+    description:
+      "Save YouTube videos, Shorts, and audio tracks in high-resolution MP4 or 320kbps MP3 format.",
+    url: "/yt",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "YouTube Video Downloader (4K & MP3) | VidSnap",
+    description:
+      "Download YouTube videos and Shorts in 4K or 1080p with crystal clear audio.",
+  },
 };
 
 export default function YouTubePage() {
@@ -29,8 +54,8 @@ export default function YouTubePage() {
       ]}
       faqs={[
         {
-          q: "Why do other tools download 1080p YouTube videos without sound?",
-          a: "YouTube serves 1080p, 2K, and 4K video as video-only DASH streams. VidSnap processes and remuxes the audio and video into a complete MP4 file on the fly.",
+          q: "What resolutions are available for download?",
+          a: "VidSnap provides direct access to all available resolutions served by YouTube, including standard progressive streams and high-resolution options up to 4K.",
         },
         {
           q: "Can I download YouTube Shorts?",

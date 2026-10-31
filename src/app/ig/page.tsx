@@ -2,9 +2,34 @@ import PlatformPageTemplate from "@/components/PlatformPageTemplate";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Instagram Video Downloader - Download Reels & Videos | VidSnap",
+  title: "Instagram Video Downloader - Save Reels & Videos",
   description:
     "Download Instagram Reels and videos in high-definition 1080p MP4 with synchronized audio. Free, fast, and unlimited online Instagram video downloader.",
+  keywords: [
+    "instagram video downloader",
+    "instagram reels downloader",
+    "save instagram reels 1080p",
+    "download ig reels with sound",
+    "instagram mp4 downloader",
+    "instagram story downloader",
+    "free instagram video saver",
+  ],
+  alternates: {
+    canonical: "/ig",
+  },
+  openGraph: {
+    title: "Instagram Video Downloader - Save Reels & Videos | VidSnap",
+    description:
+      "Save Instagram Reels and videos in crisp 1080p MP4 quality with synchronized sound. Fast, free, and watermark-free.",
+    url: "/ig",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Instagram Video & Reels Downloader | VidSnap",
+    description:
+      "Download Instagram Reels and videos in crisp 1080p MP4 quality with audio.",
+  },
 };
 
 export default function InstagramPage() {

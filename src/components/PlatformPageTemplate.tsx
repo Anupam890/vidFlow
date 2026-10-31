@@ -9,6 +9,8 @@ import HowItWorks from "@/components/HowItWorks";
 import Footer from "@/components/Footer";
 import { ExtractedMedia, Platform } from "@/lib/types";
 import { ChevronDown, Sparkles } from "lucide-react";
+import JsonLd from "@/components/JsonLd";
+import { getFaqSchema, getBreadcrumbSchema } from "@/lib/seo";
 
 interface PlatformPageProps {
   platform: Platform;
@@ -28,8 +30,28 @@ export default function PlatformPageTemplate({
   const [extractedMedia, setExtractedMedia] = useState<ExtractedMedia | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
+  const platformSlug =
+    platform === "youtube"
+      ? "yt"
+      : platform === "tiktok"
+      ? "tt"
+      : platform === "instagram"
+      ? "ig"
+      : platform === "twitter"
+      ? "tw"
+      : platform === "reddit"
+      ? "rd"
+      : "pin";
+
   return (
     <div className="relative min-h-screen flex flex-col bg-[#f8fafc] text-slate-900">
+      <JsonLd data={getFaqSchema(faqs)} />
+      <JsonLd
+        data={getBreadcrumbSchema([
+          { name: "Home", url: "/" },
+          { name: title, url: `/${platformSlug}` },
+        ])}
+      />
       <div className="ambient-glow" />
       <Navbar />
 

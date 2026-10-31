@@ -11,7 +11,6 @@ import {
   Volume2,
   FileVideo,
   HardDrive,
-  CheckCircle2,
   SlidersHorizontal,
   RotateCcw,
   Loader2,
@@ -23,32 +22,6 @@ import { useTranslation } from "@/context/LanguageContext";
 
 interface DownloadCardProps {
   media: ExtractedMedia;
-}
-
-interface DownloadProgressState {
-  id: string;
-  filename: string;
-  quality: string;
-  ext: string;
-  status: "preparing" | "transferring" | "complete" | "error";
-  progress: number;
-  message: string;
-  errorMsg?: string;
-  downloadUrl?: string;
-}
-
-function triggerBlobDownload(blob: Blob, filename: string) {
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.style.display = "none";
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => {
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  }, 1500);
 }
 
 function triggerBrowserDownload(url: string, filename: string) {
@@ -98,9 +71,36 @@ export default function DownloadCard({ media }: DownloadCardProps) {
   const [formatFilter, setFormatFilter] = useState<"all" | "mp4" | "webm">("all");
   const [resolutionFilter, setResolutionFilter] = useState<string>("all");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
-  const [downloadState, setDownloadState] = useState<DownloadProgressState | null>(null);
 
-  const handleDownload = async (
+  const [isVertical, setIsVertical] = useState<boolean>(() => {
+    const lowerUrl = (media.url || "").toLowerCase();
+    if (
+      lowerUrl.includes("/shorts/") ||
+      lowerUrl.includes("/reel/") ||
+      lowerUrl.includes("/reels/") ||
+      lowerUrl.includes("tiktok.com") ||
+      lowerUrl.includes("pinterest.com") ||
+      lowerUrl.includes("pin.it")
+    ) {
+      return true;
+    }
+
+    for (const v of media.videos) {
+      if (v.resolution) {
+        const match = v.resolution.match(/(\d+)x(\d+)/);
+        if (match) {
+          const w = parseInt(match[1], 10);
+          const h = parseInt(match[2], 10);
+          if (h > w) return true;
+          if (w > h) return false;
+        }
+      }
+    }
+
+    return media.platform === "tiktok" || media.platform === "pinterest";
+  });
+
+  const handleDownload = (
     format?: MediaFormat,
     isAudio = false,
     audioQuality = "320kbps",
@@ -143,141 +143,13 @@ export default function DownloadCard({ media }: DownloadCardProps) {
 
     const downloadEndpoint = `/api/download?${params.toString()}`;
 
-    // Initialize immediate visual feedback so user is never left in suspense
-    setDownloadState({
-      id,
-      filename: expectedFilename,
-      quality: cleanResolution,
-      ext: ext.toUpperCase(),
-      status: "preparing",
-      progress: 20,
-      message: "Connecting to media stream & multiplexing audio...",
-      downloadUrl: downloadEndpoint,
-    });
+    // Directly trigger browser download immediately
+    triggerBrowserDownload(downloadEndpoint, expectedFilename);
 
-    let currentProgress = 20;
-    const progressTimer = setInterval(() => {
-      currentProgress = Math.min(currentProgress + (currentProgress < 50 ? 8 : 3), 75);
-      setDownloadState((prev) => {
-        if (!prev || prev.status !== "preparing") return prev;
-        return {
-          ...prev,
-          progress: currentProgress,
-          message:
-            currentProgress > 45
-              ? "Muxing high-definition video & audio with FFmpeg..."
-              : "Connecting to media stream...",
-        };
-      });
-    }, 350);
-
-    try {
-      const response = await fetch(downloadEndpoint);
-      clearInterval(progressTimer);
-
-      if (!response.ok) {
-        throw new Error(`Server returned HTTP ${response.status}`);
-      }
-
-      const contentLengthHeader = response.headers.get("Content-Length");
-      const totalBytes = contentLengthHeader ? parseInt(contentLengthHeader, 10) : 0;
-
-      const reader = response.body?.getReader();
-      if (!reader) {
-        // Fallback to response.blob()
-        const blob = await response.blob();
-        triggerBlobDownload(blob, expectedFilename);
-        setDownloadState({
-          id,
-          filename: expectedFilename,
-          quality: cleanResolution,
-          ext: ext.toUpperCase(),
-          status: "complete",
-          progress: 100,
-          message: "Download complete! Saved to your downloads folder.",
-          downloadUrl: downloadEndpoint,
-        });
-        setTimeout(() => {
-          setDownloadingId(null);
-          setDownloadState(null);
-        }, 3500);
-        return;
-      }
-
-      let receivedBytes = 0;
-      const chunks: any[] = [];
-
-      setDownloadState((prev) =>
-        prev
-          ? {
-              ...prev,
-              status: "transferring",
-              progress: 80,
-              message: "Transferring file to your device...",
-            }
-          : null
-      );
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        if (value) {
-          chunks.push(value);
-          receivedBytes += value.length;
-          if (totalBytes > 0) {
-            const pct = Math.min(80 + Math.round((receivedBytes / totalBytes) * 19), 99);
-            setDownloadState((prev) =>
-              prev
-                ? {
-                    ...prev,
-                    progress: pct,
-                    message: `Saving: ${formatBytes(receivedBytes)} of ${formatBytes(totalBytes)} (${pct}%)`,
-                  }
-                : null
-            );
-          }
-        }
-      }
-
-      const contentType = response.headers.get("Content-Type") || "video/mp4";
-      const blob = new Blob(chunks, { type: contentType });
-      triggerBlobDownload(blob, expectedFilename);
-
-      setDownloadState({
-        id,
-        filename: expectedFilename,
-        quality: cleanResolution,
-        ext: ext.toUpperCase(),
-        status: "complete",
-        progress: 100,
-        message: "Download complete! File saved successfully.",
-        downloadUrl: downloadEndpoint,
-      });
-
-      setTimeout(() => {
-        setDownloadingId(null);
-        setDownloadState(null);
-      }, 3500);
-    } catch (err: any) {
-      clearInterval(progressTimer);
-      console.warn("Direct stream fetch failed, falling back to browser anchor link:", err);
-      // Fallback: trigger standard browser anchor download
-      triggerBrowserDownload(downloadEndpoint, expectedFilename);
-      setDownloadState({
-        id,
-        filename: expectedFilename,
-        quality: cleanResolution,
-        ext: ext.toUpperCase(),
-        status: "complete",
-        progress: 100,
-        message: "Download initiated in your browser!",
-        downloadUrl: downloadEndpoint,
-      });
-      setTimeout(() => {
-        setDownloadingId(null);
-        setDownloadState(null);
-      }, 4500);
-    }
+    // Reset button state after brief feedback
+    setTimeout(() => {
+      setDownloadingId(null);
+    }, 2000);
   };
 
   const uniqueResolutions = Array.from(
@@ -307,13 +179,25 @@ export default function DownloadCard({ media }: DownloadCardProps) {
       <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xl">
         {/* Top Header & Preview */}
         <div className="flex flex-col md:flex-row items-center gap-6 p-6 border-b border-slate-200 bg-slate-50/70">
-          {/* Thumbnail with duration */}
-          <div className="relative aspect-video w-full md:w-72 shrink-0 overflow-hidden rounded-xl bg-slate-100 border border-slate-200 shadow-sm">
+          {/* Thumbnail with duration & aspect-ratio adaptation */}
+          <div
+            className={`relative shrink-0 overflow-hidden rounded-2xl bg-slate-900 border border-slate-200 shadow-sm transition-all duration-300 ${
+              isVertical
+                ? "aspect-[9/16] w-36 sm:w-44 md:w-48 mx-auto md:mx-0 shadow-md ring-1 ring-slate-900/5"
+                : "aspect-video w-full md:w-72"
+            }`}
+          >
             {media.thumbnail ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={media.thumbnail}
                 alt={media.title}
+                onLoad={(e) => {
+                  const img = e.currentTarget;
+                  if (img.naturalWidth && img.naturalHeight) {
+                    setIsVertical(img.naturalHeight > img.naturalWidth);
+                  }
+                }}
                 className="h-full w-full object-cover transition-transform hover:scale-105 duration-300"
               />
             ) : (
@@ -329,8 +213,8 @@ export default function DownloadCard({ media }: DownloadCardProps) {
           </div>
 
           {/* Details */}
-          <div className="flex-1 min-w-0 text-left">
-            <div className="flex items-center gap-2 mb-2">
+          <div className="flex-1 min-w-0 text-left flex flex-col justify-center">
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
               <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-700 capitalize">
                 {media.platform}
               </span>
@@ -401,56 +285,6 @@ export default function DownloadCard({ media }: DownloadCardProps) {
 
         {/* Tab Content */}
         <div className="p-6">
-          {/* Active Download Progress Activity Card */}
-          {downloadState && (
-            <div className="mb-6 rounded-2xl border border-emerald-200/90 bg-gradient-to-r from-emerald-50/95 via-teal-50/80 to-white p-4 sm:p-5 shadow-sm animate-in fade-in slide-in-from-top-3 duration-200">
-              <div className="flex items-center justify-between gap-3 mb-2.5">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs">
-                    {downloadState.status === "complete" ? (
-                      <CheckCircle2 className="h-5 w-5" />
-                    ) : (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">
-                      {downloadState.filename}
-                    </p>
-                    <p className="text-[11px] sm:text-xs font-semibold text-emerald-700 truncate">
-                      {downloadState.message}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <span className="text-xs sm:text-sm font-mono font-extrabold text-emerald-800">
-                    {downloadState.progress}%
-                  </span>
-                </div>
-              </div>
-
-              {/* Animated Progress Bar */}
-              <div className="w-full bg-slate-200/90 rounded-full h-2 overflow-hidden shadow-inner">
-                <div
-                  className="bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500 h-2 rounded-full transition-all duration-300 ease-out"
-                  style={{ width: `${downloadState.progress}%` }}
-                />
-              </div>
-
-              {downloadState.downloadUrl && (
-                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 mt-2.5 pt-2 border-t border-emerald-100">
-                  <span>Download processing in browser</span>
-                  <a
-                    href={downloadState.downloadUrl}
-                    download={downloadState.filename}
-                    className="text-emerald-700 hover:text-emerald-800 font-bold hover:underline"
-                  >
-                    Direct Download Fallback Link
-                  </a>
-                </div>
-              )}
-            </div>
-          )}
           {activeTab === "video" && (
             <div className="space-y-4">
               {media.videos.length === 0 ? (
@@ -472,7 +306,7 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                     {downloadingId === "best" ? (
                       <>
                         <Loader2 className="h-4 w-4 text-emerald-700 animate-spin" />
-                        <span>Preparing Best Quality...</span>
+                        <span>Starting Download...</span>
                       </>
                     ) : (
                       <>
@@ -668,7 +502,7 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                             {isDownloading ? (
                               <>
                                 <Loader2 className="h-4 w-4 text-emerald-700 animate-spin" />
-                                <span>{downloadState?.status === "transferring" ? `Saving ${downloadState.progress}%` : "Preparing..."}</span>
+                                <span>Starting Download...</span>
                               </>
                             ) : (
                               <>
@@ -799,7 +633,7 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                           {isDownloading ? (
                             <>
                               <Loader2 className="h-4 w-4 animate-spin text-teal-700" />
-                              <span>{downloadState?.status === "transferring" ? `Saving ${downloadState.progress}%` : "Preparing Audio..."}</span>
+                              <span>Starting Download...</span>
                             </>
                           ) : (
                             <>

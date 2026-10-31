@@ -2,9 +2,34 @@ import PlatformPageTemplate from "@/components/PlatformPageTemplate";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Twitter (X) Video Downloader - Save X Videos & GIFs | VidSnap",
+  title: "Twitter (X) Video Downloader - Save X Videos & GIFs",
   description:
     "Download Twitter videos and X clips in high definition MP4 format. Save viral clips, news broadcasts, and animated GIFs instantly.",
+  keywords: [
+    "twitter video downloader",
+    "x video downloader",
+    "download twitter video",
+    "save twitter gif to mp4",
+    "x clip downloader",
+    "twitter video download hd",
+    "free twitter downloader",
+  ],
+  alternates: {
+    canonical: "/tw",
+  },
+  openGraph: {
+    title: "Twitter (X) Video Downloader - Save X Videos & GIFs | VidSnap",
+    description:
+      "Save Twitter (X) video tweets, breaking news clips, and animated GIFs in HD MP4 quality. Fast, safe, and completely free.",
+    url: "/tw",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Twitter / X Video Downloader | VidSnap",
+    description:
+      "Download Twitter (X) videos and GIFs in full HD MP4 quality.",
+  },
 };
 
 export default function TwitterPage() {

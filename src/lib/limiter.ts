@@ -1,5 +1,5 @@
 /**
- * Global semaphore for CPU and bandwidth heavy media jobs (yt-dlp, ffmpeg).
+ * Global semaphore for CPU and bandwidth heavy media jobs (yt-dlp).
  *
  * Without this, every concurrent visitor spawns its own extractor and encoder
  * process, so a handful of users is enough to make the whole box unresponsive.

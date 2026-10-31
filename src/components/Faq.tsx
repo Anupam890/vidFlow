@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { ChevronDown, HelpCircle } from "lucide-react";
+import JsonLd from "@/components/JsonLd";
+import { getFaqSchema } from "@/lib/seo";
 
 export default function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -16,8 +18,8 @@ export default function Faq() {
       a: "Yes! VidSnap automatically strips the TikTok watermark, giving you a clean, full-resolution MP4 video suitable for archiving or offline viewing.",
     },
     {
-      q: "Why do high-res (1080p / 4K) videos from other downloaders often have no audio?",
-      a: "Platforms like YouTube and Reddit deliver video and audio as separate adaptive streams for resolutions higher than 720p. Most downloaders only grab the video stream. VidSnap utilizes server-side FFmpeg remuxing to seamlessly combine the highest-quality video and audio into a single complete MP4 file.",
+      q: "Can I download videos in high definition?",
+      a: "Yes! VidSnap provides direct access to all available video resolutions delivered by the platform, from 360p and 720p HD up to 1080p and 4K.",
     },
     {
       q: "Can I download audio or convert videos to MP3?",
@@ -39,6 +41,7 @@ export default function Faq() {
 
   return (
     <section className="relative py-20 bg-white border-t border-slate-200/80">
+      <JsonLd data={getFaqSchema(faqs)} />
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 mb-3 shadow-xs">

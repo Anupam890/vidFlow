@@ -94,7 +94,7 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
       "Everything you need in a modern video downloader, without popups or shady downloads.",
     "features.f1_title": "Crystal Clear 4K & Full HD",
     "features.f1_desc":
-      "Save videos in their highest available resolutions—from 720p HD up to 4K 60fps—with synchronized audio remuxing.",
+      "Save videos in their highest available resolutions—from 720p HD up to 4K 60fps—with peak download speed.",
     "features.f2_title": "100% Watermark-Free",
     "features.f2_desc":
       "Download TikTok videos and Instagram Reels cleanly without distracting logos or overlays for smooth offline viewing.",

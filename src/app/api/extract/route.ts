@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
     const data = await runLimited(() => extractMediaInfo(trimmedUrl));
 
-    // No background preheat: downloading and muxing the top format on every
+    // No background preheat: downloading the top format on every
     // paste doubled CPU and bandwidth, including for visitors who never
     // clicked Download. The work now happens only in /api/download.
 

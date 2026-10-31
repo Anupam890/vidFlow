@@ -1,5 +1,5 @@
 # ==============================================================================
-# Production Dockerfile for VidSnap (Next.js 16 + FFmpeg + yt-dlp + gallery-dl)
+# Production Dockerfile for VidSnap (Next.js 16 + yt-dlp + gallery-dl)
 # Multi-stage build optimized for minimum image size, security, and performance.
 # ==============================================================================
 
@@ -45,7 +45,7 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Install production system dependencies:
-# - ffmpeg: Required for video/audio remuxing and quality conversion
+# - ffmpeg: Audio/video multiplexing and format handling
 # - python3 + python3-venv: Runtime for yt-dlp, gallery-dl, and instaloader
 # - ca-certificates: TLS verification for media streams
 # - curl: Healthchecks and diagnostic tooling

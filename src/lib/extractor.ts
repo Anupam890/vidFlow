@@ -10,17 +10,6 @@ export * from "./types";
 
 const execFileAsync = promisify(execFile);
 
-// Local FFmpeg directory
-export const LOCAL_FFMPEG_DIR =
-  "C:\\Users\\anupa\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin";
-
-try {
-  if (fs.existsSync(/*turbopackIgnore: true*/ LOCAL_FFMPEG_DIR)) {
-    if (process.env.PATH && !process.env.PATH.includes(LOCAL_FFMPEG_DIR)) {
-      process.env.PATH = `${process.env.PATH};${LOCAL_FFMPEG_DIR}`;
-    }
-  }
-} catch {}
 
 // Persistent file-based cache paths across Next.js workers
 const CACHE_DIR = path.join(os.tmpdir(), "vidflow_cache");
@@ -31,23 +20,7 @@ try {
   if (!fs.existsSync(PREPARED_DIR)) fs.mkdirSync(PREPARED_DIR, { recursive: true });
 } catch {}
 
-// Re-encoding is the most expensive thing this server does. Anything above
-// these limits is refused rather than allowed to monopolise the machine.
-const MAX_TRANSCODE_HEIGHT = Number(process.env.MAX_TRANSCODE_HEIGHT || 720);
-const MAX_TRANSCODE_SECONDS = Number(process.env.MAX_TRANSCODE_SECONDS || 600);
 
-const FFMPEG_LOW_PRIORITY = process.platform !== "win32";
-
-/**
- * Runs ffmpeg pinned to a single thread and at low CPU priority, so a long
- * transcode cannot starve the web server on a small box.
- */
-function runFfmpeg(args: string[]) {
-  const throttled = ["-threads", "1", "-filter_threads", "1", ...args];
-  return FFMPEG_LOW_PRIORITY
-    ? execFileAsync("nice", ["-n", "15", "ffmpeg", ...throttled], { env: process.env })
-    : execFileAsync("ffmpeg", throttled, { env: process.env });
-}
 
 function getCacheKey(url: string): string {
   const clean = (url || "").trim().toLowerCase().replace(/\/$/, "");
@@ -114,23 +87,6 @@ export function setCachedMedia(url: string, data: ExtractedMedia, rawFormats?: a
     const cacheFile = path.join(CACHE_DIR, `${key}.json`);
     fs.writeFileSync(cacheFile, JSON.stringify(item), "utf-8");
   } catch {}
-}
-
-/**
- * Discovers ffmpeg location for yt-dlp.
- * On Docker / Linux production, ffmpeg is in system PATH (/usr/bin/ffmpeg).
- * On local Windows, uses LOCAL_FFMPEG_DIR if it exists.
- */
-export function getFfmpegLocationArgs(): string[] {
-  if (process.env.FFMPEG_LOCATION && fs.existsSync(/*turbopackIgnore: true*/ process.env.FFMPEG_LOCATION)) {
-    return ["--ffmpeg-location", process.env.FFMPEG_LOCATION];
-  }
-  try {
-    if (LOCAL_FFMPEG_DIR && fs.existsSync(/*turbopackIgnore: true*/ LOCAL_FFMPEG_DIR)) {
-      return ["--ffmpeg-location", LOCAL_FFMPEG_DIR];
-    }
-  } catch {}
-  return [];
 }
 
 /**
@@ -398,7 +354,6 @@ export async function extractMediaInfo(targetUrl: string): Promise<ExtractedMedi
   const cookieArgs = getCookiesArgs();
 
   const args = [
-    ...getFfmpegLocationArgs(),
     "-J",
     "--no-warnings",
     "--no-check-certificates",
@@ -482,9 +437,8 @@ export async function extractMediaInfo(targetUrl: string): Promise<ExtractedMedi
         rawSize = Math.round((estimateBitrateByHeight(effectiveHeight) * 1000 / 8) * duration);
       }
 
-      const hasAudio = f.acodec && f.acodec !== "none";
-      // Crucial: Video-only DASH streams get merged with best audio, so total size must include audio track!
-      const totalSize = hasAudio ? rawSize : ((rawSize || 0) + bestAudioSize);
+      const hasNativeAudio = !!(f.acodec && f.acodec !== "none");
+      const totalSize = hasNativeAudio ? rawSize : ((rawSize || 0) + bestAudioSize);
 
       if (totalSize && totalSize > baseRefSize) {
         baseRefSize = totalSize;
@@ -528,44 +482,7 @@ export async function extractMediaInfo(targetUrl: string): Promise<ExtractedMedi
       }
     }
 
-    // 3. Guarantee full resolution ladder downwards so users are NEVER restricted to only 1-2 formats
-    const standardTiers = [
-      { label: "1080p Full HD", rank: 1080, res: "1920x1080", ratio: 1.0 },
-      { label: "720p HD", rank: 720, res: "1280x720", ratio: 0.65 },
-      { label: "480p", rank: 480, res: "854x480", ratio: 0.38 },
-      { label: "360p", rank: 360, res: "640x360", ratio: 0.24 },
-    ];
-
-    // Only synthesise MP4 tiers. A missing tier has to be re-encoded on demand,
-    // and VP9/WebM encoding is far too expensive for a small shared box — a
-    // single clip can occupy every core for longer than the video itself runs.
-    const effectiveMaxRank = maxQualityRank > 0 ? maxQualityRank : 1080;
-    for (const tier of standardTiers) {
-      if (tier.rank > effectiveMaxRank) continue;
-      if (tier.rank > MAX_TRANSCODE_HEIGHT) continue;
-
-      const key = `${tier.label}_mp4`;
-      if (formatMap.has(key)) continue;
-
-      const estBytes = baseRefSize > 0
-        ? Math.round(baseRefSize * tier.ratio)
-        : Math.round(((estimateBitrateByHeight(tier.rank) + 128) * 1000 / 8) * (duration || 180));
-
-      formatMap.set(key, {
-        id: `scale:${tier.rank}:mp4`,
-        ext: "mp4",
-        quality: tier.label,
-        resolution: tier.res,
-        filesize: estBytes,
-        filesizeApprox: estBytes,
-        hasAudio: true,
-        hasVideo: true,
-        qualityRank: tier.rank,
-        isTranscode: true,
-      });
-    }
-
-    // 4. Sort video formats logically: highest resolution first, with MP4 placed ahead of WEBM
+    // 3. Sort video formats logically: highest resolution first, with MP4 placed ahead of WEBM
     const videos = Array.from(formatMap.values()).sort((a, b) => {
       const rankA = a.qualityRank || 0;
       const rankB = b.qualityRank || 0;
@@ -615,7 +532,7 @@ export async function extractMediaInfo(targetUrl: string): Promise<ExtractedMedi
 
 /**
  * Downloads and prepares a clean, 100% compliant media file
- * Optimized for ultra-fast response using persistent caching and direct FFmpeg muxing
+ * Optimized for ultra-fast response using persistent caching and direct stream downloads
  */
 export async function prepareMediaFile(
   targetUrl: string,
@@ -632,15 +549,11 @@ export async function prepareMediaFile(
     throw new Error("WebM output is not available. Please choose an MP4 format.");
   }
 
-  // Refuse re-encodes that would tie up the box for longer than they are worth.
+  // Refuse re-encodes
   if (options.formatId?.startsWith("scale:")) {
-    const targetHeight = parseInt(options.formatId.split(":")[1]) || 720;
-    const cachedDuration = getCachedMedia(targetUrl)?.duration || 0;
-    if (targetHeight > MAX_TRANSCODE_HEIGHT || cachedDuration > MAX_TRANSCODE_SECONDS) {
-      throw new Error(
-        "This quality needs re-encoding, which is disabled for long or high-resolution videos. Please pick one of the native formats instead."
-      );
-    }
+    throw new Error(
+      "Re-encoding is disabled. Please pick one of the native formats instead."
+    );
   }
 
   const cacheKey = getCacheKey(targetUrl);
@@ -675,35 +588,19 @@ export async function prepareMediaFile(
     if (options.audioOnly) {
       const streamUrl = mediaData.audios[0]?.url || mediaData.directDownloadUrl || mediaData.videos[0]?.url;
       if (streamUrl) {
-        const rawTempAudio = path.join(tempDir, `${fileUid}_raw.mp4`);
         const streamRes = await fetch(streamUrl, {
           headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
         });
         if (streamRes.ok) {
-          fs.writeFileSync(rawTempAudio, Buffer.from(await streamRes.arrayBuffer()));
-          const audioBitrate = options.quality?.replace(/[^\d]/g, "") || "320";
-          try {
-            await runFfmpeg([
-              "-y",
-              "-i", rawTempAudio,
-              "-vn",
-              ...(targetExt === "mp3" ? ["-c:a", "libmp3lame", "-b:a", `${audioBitrate}k`] : []),
-              ...(targetExt === "m4a" ? ["-c:a", "aac", "-b:a", `${audioBitrate}k`] : []),
-              finalPath,
-            ]);
-            try { if (fs.existsSync(rawTempAudio)) fs.unlinkSync(rawTempAudio); } catch {}
-            const stat = fs.statSync(finalPath);
-            return { filePath: finalPath, cleanup: () => {}, size: stat.size };
-          } catch {
-            const stat = fs.statSync(rawTempAudio);
-            return { filePath: rawTempAudio, cleanup: () => {}, size: stat.size };
-          }
+          fs.writeFileSync(finalPath, Buffer.from(await streamRes.arrayBuffer()));
+          const stat = fs.statSync(finalPath);
+          return { filePath: finalPath, cleanup: () => {}, size: stat.size };
         }
       }
     }
 
     // Video download for TikTok
-    const streamUrl = (options.formatId === "nowm" || options.formatId === "scale:720:mp4" || !mediaData.videos[0]?.url)
+    const streamUrl = (options.formatId === "nowm" || !mediaData.videos[0]?.url)
       ? (mediaData.videos.find((v) => v.id === "nowm")?.url || mediaData.videos[0]?.url)
       : mediaData.videos[0]?.url;
 
@@ -713,109 +610,36 @@ export async function prepareMediaFile(
       });
 
       if (streamRes.ok) {
-        const rawVideo = path.join(tempDir, `${fileUid}_raw.mp4`);
-        fs.writeFileSync(rawVideo, Buffer.from(await streamRes.arrayBuffer()));
-
-        const isScale = options.formatId?.startsWith("scale:");
-        const isWebm = targetExt === "webm";
-
-        if (isScale || isWebm) {
-          const targetHeight = isScale ? parseInt(options.formatId!.split(":")[1]) || 720 : 1080;
-          try {
-            const ffmpegArgs = ["-y", "-i", rawVideo];
-            if (isScale) {
-              ffmpegArgs.push("-vf", `scale=-2:${targetHeight}`);
-            }
-            if (isWebm) {
-              ffmpegArgs.push("-c:v", "libvpx-vp9", "-b:v", "0", "-crf", "30", "-c:a", "libopus");
-            } else {
-              ffmpegArgs.push("-c:v", "libx264", "-preset", "ultrafast", "-crf", "23", "-c:a", "copy");
-            }
-            ffmpegArgs.push(finalPath);
-
-            await runFfmpeg(ffmpegArgs);
-            try { if (fs.existsSync(rawVideo)) fs.unlinkSync(rawVideo); } catch {}
-            const stat = fs.statSync(finalPath);
-            return { filePath: finalPath, cleanup: () => {}, size: stat.size };
-          } catch {}
-        }
-
-        // Direct stream copy
-        try {
-          fs.renameSync(rawVideo, finalPath);
-        } catch {
-          fs.copyFileSync(rawVideo, finalPath);
-        }
+        fs.writeFileSync(finalPath, Buffer.from(await streamRes.arrayBuffer()));
         const stat = fs.statSync(finalPath);
         return { filePath: finalPath, cleanup: () => {}, size: stat.size };
       }
     }
   }
 
-  // 3. Ultra-fast direct FFmpeg muxing from cached stream URLs
+  // 3. Direct stream download from cached stream URLs
   const cachedFormats = getCachedRawFormats(targetUrl);
   if (cachedFormats && cachedFormats.length > 0) {
     try {
-      // Filter out slow throttled HLS m3u8 playlists for direct high-speed byte streaming
       const directStreams = cachedFormats.filter(
         (f) => f.url?.startsWith("http") && !f.url?.includes(".m3u8")
       );
       const formatsPool = directStreams.length > 0 ? directStreams : cachedFormats;
 
-      // Select optimal audio track: prefer AAC/m4a for MP4 container, Opus for WebM, with highest bitrate
-      const audioStreams = formatsPool.filter(
-        (f) => f.acodec && f.acodec !== "none" && (!f.vcodec || f.vcodec === "none")
-      );
-      let fAudio = targetExt === "mp4" || targetExt === "m4a"
-        ? audioStreams.filter((f) => f.ext === "m4a" || f.acodec?.includes("mp4a")).sort((a, b) => (b.abr || b.tbr || 0) - (a.abr || a.tbr || 0))[0]
-        : audioStreams.filter((f) => f.ext === "webm" || f.acodec?.includes("opus")).sort((a, b) => (b.abr || b.tbr || 0) - (a.abr || a.tbr || 0))[0];
-
-      if (!fAudio) {
-        fAudio = audioStreams.sort((a, b) => (b.abr || b.tbr || 0) - (a.abr || a.tbr || 0))[0] ||
-                 formatsPool.find((f) => f.acodec && f.acodec !== "none");
-      }
-
       if (options.audioOnly) {
+        const audioStreams = formatsPool.filter(
+          (f) => f.acodec && f.acodec !== "none" && (!f.vcodec || f.vcodec === "none")
+        );
+        const fAudio = audioStreams[0] || formatsPool.find((f) => f.acodec && f.acodec !== "none");
         if (fAudio?.url) {
-          const audioBitrate = options.quality?.replace(/[^\d]/g, "") || "320";
-          const ffmpegArgs = ["-y", "-i", fAudio.url, "-vn"];
-          if (targetExt === "mp3") {
-            ffmpegArgs.push("-c:a", "libmp3lame", "-b:a", `${audioBitrate}k`);
-          } else if (targetExt === "m4a") {
-            ffmpegArgs.push("-c:a", "aac", "-b:a", `${audioBitrate}k`);
+          const res = await fetch(fAudio.url, {
+            headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
+          });
+          if (res.ok) {
+            fs.writeFileSync(finalPath, Buffer.from(await res.arrayBuffer()));
+            const stat = fs.statSync(finalPath);
+            return { filePath: finalPath, cleanup: () => {}, size: stat.size };
           }
-          ffmpegArgs.push(finalPath);
-          await runFfmpeg(ffmpegArgs);
-          const stat = fs.statSync(finalPath);
-          return { filePath: finalPath, cleanup: () => {}, size: stat.size };
-        }
-      } else if (options.formatId?.startsWith("scale:")) {
-        const targetHeight = parseInt(options.formatId.split(":")[1]) || 720;
-        const videoStreams = formatsPool
-          .filter((f) => f.vcodec && f.vcodec !== "none" && f.height)
-          .sort((a, b) => (a.height || 0) - (b.height || 0));
-        const fVideo = videoStreams.find((f) => f.height >= targetHeight) ||
-                       videoStreams[videoStreams.length - 1] ||
-                       formatsPool.find((f) => f.vcodec && f.vcodec !== "none") ||
-                       formatsPool[0];
-
-        if (fVideo?.url) {
-          const ffmpegArgs = ["-y", "-i", fVideo.url];
-          if (fAudio?.url && (!fVideo.acodec || fVideo.acodec === "none")) {
-            ffmpegArgs.push("-i", fAudio.url);
-          }
-          ffmpegArgs.push(
-            "-vf", `scale=-2:${targetHeight}`,
-            "-c:v", targetExt === "webm" ? "libvpx-vp9" : "libx264",
-            "-preset", "ultrafast",
-            "-crf", "23",
-            "-c:a", "copy",
-            "-movflags", "+faststart",
-            finalPath
-          );
-          await runFfmpeg(ffmpegArgs);
-          const stat = fs.statSync(finalPath);
-          return { filePath: finalPath, cleanup: () => {}, size: stat.size };
         }
       } else {
         const fVideo = formatsPool.find((f) => f.format_id === options.formatId) ||
@@ -824,31 +648,43 @@ export async function prepareMediaFile(
                        cachedFormats.find((f) => f.vcodec && f.vcodec !== "none" && f.url?.startsWith("http"));
 
         if (fVideo?.url) {
-          // If stream already contains audio (progressive)
+          // If stream already contains audio (progressive video like TikTok, Instagram, Twitter, YouTube 360p)
           if (fVideo.acodec && fVideo.acodec !== "none") {
-            const ffmpegArgs = ["-y", "-i", fVideo.url, "-c", "copy", "-movflags", "+faststart", finalPath];
-            await runFfmpeg(ffmpegArgs);
-            const stat = fs.statSync(finalPath);
-            return { filePath: finalPath, cleanup: () => {}, size: stat.size };
+            const streamRes = await fetch(fVideo.url, {
+              headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" },
+            });
+            if (streamRes.ok) {
+              fs.writeFileSync(finalPath, Buffer.from(await streamRes.arrayBuffer()));
+              const stat = fs.statSync(finalPath);
+              return { filePath: finalPath, cleanup: () => {}, size: stat.size };
+            }
           }
-          // Direct fast stream copy muxing (takes ~1-2s!)
+
+          // Video-only adaptive stream (e.g. YouTube 1080p): merge with audio stream so file has full sound
+          const audioStreams = formatsPool.filter(
+            (f) => f.acodec && f.acodec !== "none" && (!f.vcodec || f.vcodec === "none")
+          );
+          const fAudio = audioStreams[0] || formatsPool.find((f) => f.acodec && f.acodec !== "none");
           if (fAudio?.url) {
-            const ffmpegArgs = [
-              "-y",
-              "-i", fVideo.url,
-              "-i", fAudio.url,
-              "-c", "copy",
-              "-movflags", "+faststart",
-              finalPath,
-            ];
-            await runFfmpeg(ffmpegArgs);
-            const stat = fs.statSync(finalPath);
-            return { filePath: finalPath, cleanup: () => {}, size: stat.size };
+            try {
+              await execFileAsync("ffmpeg", [
+                "-y",
+                "-i", fVideo.url,
+                "-i", fAudio.url,
+                "-c", "copy",
+                "-movflags", "+faststart",
+                finalPath,
+              ]);
+              const stat = fs.statSync(finalPath);
+              return { filePath: finalPath, cleanup: () => {}, size: stat.size };
+            } catch (copyErr) {
+              console.warn("Direct stream copy muxing failed, falling back to yt-dlp:", copyErr);
+            }
           }
         }
       }
-    } catch (directMuxError) {
-      console.warn("Fast direct FFmpeg muxing fallback triggered:", directMuxError);
+    } catch (directDownloadError) {
+      console.warn("Direct stream download fallback triggered:", directDownloadError);
     }
   }
 
@@ -857,7 +693,6 @@ export async function prepareMediaFile(
   const cookieArgs = getCookiesArgs();
 
   const args = [
-    ...getFfmpegLocationArgs(),
     "--no-warnings",
     "--no-check-certificates",
     "--remote-components", "ejs:github",
@@ -867,20 +702,7 @@ export async function prepareMediaFile(
   ];
 
   if (options.audioOnly) {
-    const audioExt = options.ext || "mp3";
-    args.push("-x", "--audio-format", audioExt);
-    if (options.quality) {
-      const qNum = options.quality.replace(/[^\d]/g, "");
-      if (qNum) args.push("--audio-quality", `${qNum}k`);
-    }
-  } else if (options.formatId?.startsWith("scale:")) {
-    const targetHeight = options.formatId.split(":")[1] || "720";
-    args.push(
-      "-f",
-      `bestvideo[height<=${targetHeight}]+bestaudio/best[height<=${targetHeight}]/bestvideo+bestaudio/best`
-    );
-    args.push("--postprocessor-args", `VideoConvertor:-vf scale=-2:${targetHeight}`);
-    args.push("--merge-output-format", targetExt);
+    args.push("-f", "ba/b");
   } else if (options.formatId && options.formatId !== "direct") {
     args.push("-f", `${options.formatId}+bestaudio/best`);
     args.push("--merge-output-format", targetExt);
@@ -915,7 +737,13 @@ export async function prepareMediaFile(
 
   return {
     filePath: fs.existsSync(finalPath) ? finalPath : generatedFile,
-    cleanup: () => {},
+    cleanup: () => {
+      try {
+        if (generatedFile !== finalPath && fs.existsSync(/*turbopackIgnore: true*/ generatedFile)) {
+          fs.unlinkSync(generatedFile);
+        }
+      } catch {}
+    },
     size: finalStat.size,
   };
 }

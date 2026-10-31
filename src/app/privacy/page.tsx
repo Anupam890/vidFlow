@@ -4,9 +4,12 @@ import { ShieldCheck, Lock, EyeOff, Server, Mail } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | VidSnap - Operated by 360xLabs",
+  title: "Privacy Policy",
   description:
     "VidSnap operates with a strict zero-logging, anonymous policy. Learn how 360xLabs protects your data and privacy when using our video downloader.",
+  alternates: {
+    canonical: "/privacy",
+  },
 };
 
 export default function PrivacyPolicyPage() {

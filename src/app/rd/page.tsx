@@ -2,21 +2,46 @@ import PlatformPageTemplate from "@/components/PlatformPageTemplate";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Reddit Video Downloader With Sound & Audio | VidSnap",
+  title: "Reddit Video Downloader With Sound & Audio",
   description:
     "Download Reddit videos with audio automatically merged into a single clean MP4 file. Supports v.redd.it links, gifs, and audio extraction.",
+  keywords: [
+    "reddit video downloader",
+    "reddit video download with audio",
+    "v.redd.it downloader",
+    "reddit video sound fix",
+    "save reddit video mp4",
+    "reddit clip downloader",
+    "free reddit downloader",
+  ],
+  alternates: {
+    canonical: "/rd",
+  },
+  openGraph: {
+    title: "Reddit Video Downloader With Sound | VidSnap",
+    description:
+      "Download Reddit videos with audio automatically merged into a single clean MP4 file.",
+    url: "/rd",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Reddit Video Downloader With Sound | VidSnap",
+    description:
+      "Save Reddit videos and v.redd.it clips with crystal-clear merged audio.",
+  },
 };
 
 export default function RedditPage() {
   return (
     <PlatformPageTemplate
       platform="reddit"
-      title="Reddit Video Downloader With Audio"
-      subtitle="Save v.redd.it videos with crystal clear synchronized audio. Resolves the infamous silent Reddit download bug automatically."
+      title="Reddit Video Downloader"
+      subtitle="Save v.redd.it videos and media links instantly with full resolution support and synced audio."
       tips={[
         {
-          title: "Automatic Audio Remuxing",
-          desc: "Reddit stores video and audio tracks separately. VidSnap automatically multiplexes them into a single clean MP4 file.",
+          title: "Direct Video Downloads",
+          desc: "Download high quality Reddit videos directly to your device with maximum speed.",
         },
         {
           title: "Supports v.redd.it Links",
@@ -28,10 +53,6 @@ export default function RedditPage() {
         },
       ]}
       faqs={[
-        {
-          q: "Why do downloaded Reddit videos usually have no sound?",
-          a: "Reddit uses DASH video streaming which separates the video (DASH_video) from the audio (DASH_audio). VidSnap merges both channels on our servers so your file has complete sound.",
-        },
         {
           q: "How do I get the link to a Reddit video?",
           a: "Click 'Share' underneath the Reddit post, select 'Copy Link', and paste it into VidSnap.",

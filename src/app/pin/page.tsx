@@ -2,9 +2,34 @@ import PlatformPageTemplate from "@/components/PlatformPageTemplate";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pinterest Video & Image Downloader - Save Pins & GIFs | VidSnap",
+  title: "Pinterest Video & Image Downloader - Save Pins & GIFs",
   description:
     "Download Pinterest videos, ideas, GIFs, and high-resolution images. Fast, free, and unlimited online Pinterest pin downloader.",
+  keywords: [
+    "pinterest video downloader",
+    "download pinterest video",
+    "save pinterest pins",
+    "pinterest gif downloader",
+    "pinterest image downloader hd",
+    "pinterest idea pin downloader",
+    "free pinterest downloader",
+  ],
+  alternates: {
+    canonical: "/pin",
+  },
+  openGraph: {
+    title: "Pinterest Video & Pin Downloader | VidSnap",
+    description:
+      "Save aesthetic Pinterest pins, creative video tutorials, and looping animations in original high definition quality.",
+    url: "/pin",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pinterest Video & Image Downloader | VidSnap",
+    description:
+      "Download Pinterest videos, idea pins, and GIFs in full HD.",
+  },
 };
 
 export default function PinterestPage() {

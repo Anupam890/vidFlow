@@ -4,9 +4,12 @@ import { FileText, ShieldAlert, CheckCircle2, Scale, Mail, AlertTriangle } from 
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | VidSnap by 360xLabs",
+  title: "Terms of Service",
   description:
     "Terms of Service and DMCA compliance policy for VidSnap, operated by 360xLabs. Please review our fair-use and copyright guidelines.",
+  alternates: {
+    canonical: "/terms",
+  },
 };
 
 export default function TermsOfServicePage() {
