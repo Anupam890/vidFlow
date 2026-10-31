@@ -132,11 +132,11 @@ function formatExtractionError(rawError: any): string {
     msg.includes("Use --cookies") ||
     msg.includes("login_required")
   ) {
-    return "Instagram Stories & Highlights require an Instagram session. To enable story downloads, save a cookies.txt file into the vidsnap folder or set INSTAGRAM_SESSION_ID in .env.local. Public Reels and Posts can be downloaded directly without login.";
+    return "This content is private or requires login. Only public videos and Reels can be downloaded.";
   }
 
   if (msg.includes("empty media response") || msg.includes("Unable to extract data")) {
-    return "Instagram did not return media for this link. The story or post might be expired, private, or temporarily rate-limited. Try public Reels or feed posts.";
+    return "Instagram did not return media for this link. The post might be expired, private, or temporarily unavailable. Please verify the URL is a public Reel or post.";
   }
 
   if (msg.includes("Private video") || msg.includes("account is private")) {
