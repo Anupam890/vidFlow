@@ -95,6 +95,9 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-icon",
   },
+  verification: {
+    google: "6MUeO2-_VKn2Rf5Gn0i2fzJsr5tIY0oWnphtjvdAMqk",
+  },
 };
 
 export default function RootLayout({
@@ -108,6 +111,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
+        <meta name="google-site-verification" content="6MUeO2-_VKn2Rf5Gn0i2fzJsr5tIY0oWnphtjvdAMqk" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-icon" />
         <JsonLd data={getWebSiteSchema()} />
