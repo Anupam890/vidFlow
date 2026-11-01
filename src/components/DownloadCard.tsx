@@ -99,7 +99,7 @@ export default function DownloadCard({ media }: DownloadCardProps) {
       }
     }
 
-    return media.platform === "tiktok" || media.platform === "pinterest";
+    return media.platform === "tiktok" || media.platform === "pinterest" || media.platform === "threads";
   });
 
   const handleDownload = async (

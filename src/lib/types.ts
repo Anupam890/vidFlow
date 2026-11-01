@@ -6,6 +6,7 @@ export type Platform =
   | "facebook"
   | "reddit"
   | "pinterest"
+  | "threads"
   | "generic";
 
 export interface MediaFormat {
@@ -47,5 +48,6 @@ export function detectPlatform(url: string): Platform {
   if (lower.includes("facebook.com") || lower.includes("fb.watch")) return "facebook";
   if (lower.includes("reddit.com") || lower.includes("redd.it")) return "reddit";
   if (lower.includes("pinterest.com") || lower.includes("pin.it")) return "pinterest";
+  if (lower.includes("threads.net") || lower.includes("threads.com")) return "threads";
   return "generic";
 }
