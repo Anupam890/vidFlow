@@ -36,7 +36,18 @@ export default function MonetagScripts() {
         />
       )}
 
-      {/* 2. Monetag Web Push Tag for Zone 12166520 */}
+      {/* 2. Monetag OnClick / Popunder (Zone 304353) */}
+      {ADS_CONFIG.popunder.enabled && ADS_CONFIG.popunder.scriptUrl && (
+        <Script
+          id="monetag-popunder"
+          src={ADS_CONFIG.popunder.scriptUrl}
+          data-zone={ADS_CONFIG.popunder.zoneId}
+          data-cfasync="false"
+          strategy="afterInteractive"
+        />
+      )}
+
+      {/* 3. Monetag Web Push Tag for Zone 12166520 */}
       {ADS_CONFIG.pushNotifications.enabled && ADS_CONFIG.pushNotifications.tagScriptUrl && (
         <Script
           id="monetag-push-tag"
@@ -45,7 +56,7 @@ export default function MonetagScripts() {
         />
       )}
 
-      {/* 3. In-Page Push (Native Notification Widget) */}
+      {/* 4. In-Page Push (Native Notification Widget) */}
       {ADS_CONFIG.inPagePushScriptUrl && (
         <Script
           id="monetag-in-page-push"
@@ -54,20 +65,11 @@ export default function MonetagScripts() {
         />
       )}
 
-      {/* 4. Vignette (Interstitial banner on download click) */}
+      {/* 5. Vignette (Interstitial banner on download click) */}
       {ADS_CONFIG.vignetteScriptUrl && (
         <Script
           id="monetag-vignette"
           src={ADS_CONFIG.vignetteScriptUrl}
-          strategy="afterInteractive"
-        />
-      )}
-
-      {/* 5. OnClick / Popunder */}
-      {ADS_CONFIG.popunderScriptUrl && (
-        <Script
-          id="monetag-popunder"
-          src={ADS_CONFIG.popunderScriptUrl}
           strategy="afterInteractive"
         />
       )}

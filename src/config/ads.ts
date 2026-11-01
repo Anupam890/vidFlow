@@ -24,12 +24,18 @@ export const ADS_CONFIG = {
     tagScriptUrl: "https://5gvci.com/pfe/current/tag.min.js?z=12166520",
   },
 
-  // 3. High-Paying Automated Formats (from Monetag Dashboard -> Add Zone)
+  // 3. OnClick / Popunder (Zone 304353)
+  popunder: {
+    enabled: true,
+    scriptUrl: "https://quge5.com/88/tag.min.js",
+    zoneId: "304353",
+  },
+
+  // 4. Other Automated Formats (can be added anytime)
   inPagePushScriptUrl: "", // In-Page Push (Native notification badge)
   vignetteScriptUrl: "",   // Vignette / Interstitial (shows on download click)
-  popunderScriptUrl: "",   // OnClick / Popunder (triggers once per 24h)
 
-  // 4. Banner Zone IDs / Script URLs (For display banners)
+  // 5. Banner Zone IDs / Script URLs (For display banners)
   zones: {
     // Top banner directly below the search input (728x90 desktop / 300x250 mobile)
     topBanner: {

@@ -103,3 +103,4 @@ export default function AdSlot({ slot, className = "" }: AdSlotProps) {
     </div>
   );
 }
+
