@@ -21,6 +21,8 @@ const nextConfig: NextConfig = {
       { source: "/twitter", destination: "/tw", permanent: true },
       { source: "/reddit", destination: "/rd", permanent: true },
       { source: "/pinterest", destination: "/pin", permanent: true },
+      { source: "/threads", destination: "/th", permanent: true },
+      { source: "/threads/:path*", destination: "/th", permanent: true },
     ];
   },
 };

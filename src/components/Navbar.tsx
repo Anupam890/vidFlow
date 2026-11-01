@@ -15,6 +15,7 @@ export default function Navbar() {
     { name: t("nav.tiktok"), id: "tiktok", href: "/tt", aliases: ["/tiktok"] },
     { name: t("nav.instagram"), id: "instagram", href: "/ig", aliases: ["/instagram"] },
     { name: t("nav.twitter"), id: "twitter", href: "/tw", aliases: ["/twitter", "/x"] },
+    { name: "Threads", id: "threads", href: "/th", aliases: ["/threads"] },
     { name: t("nav.reddit"), id: "reddit", href: "/rd", aliases: ["/reddit"] },
     { name: t("nav.pinterest"), id: "pinterest", href: "/pin", aliases: ["/pinterest"] },
   ];

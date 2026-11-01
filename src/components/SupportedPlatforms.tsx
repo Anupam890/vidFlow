@@ -10,6 +10,7 @@ import {
   TwitterXIcon,
   RedditIcon,
   PinterestIcon,
+  ThreadsIcon,
 } from "./BrandIcons";
 
 export default function SupportedPlatforms() {
@@ -58,6 +59,17 @@ export default function SupportedPlatforms() {
       borderGlow: "hover:border-sky-400 hover:shadow-sky-500/10",
       tag: "Fast Parsing",
       icon: TwitterXIcon,
+      iconColor: "text-slate-900",
+    },
+    {
+      name: "Threads Downloader",
+      slug: "/th",
+      desc: "Save Meta Threads video posts, clips, and media in full HD MP4 with crystal-clear audio.",
+      badge: "Threads Video",
+      badgeColor: "bg-slate-100 text-slate-800 border-slate-300",
+      borderGlow: "hover:border-slate-500 hover:shadow-slate-500/10",
+      tag: "HD MP4",
+      icon: ThreadsIcon,
       iconColor: "text-slate-900",
     },
     {

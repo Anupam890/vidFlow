@@ -41,6 +41,8 @@ export default function PlatformPageTemplate({
       ? "tw"
       : platform === "reddit"
       ? "rd"
+      : platform === "threads"
+      ? "th"
       : "pin";
 
   return (

@@ -47,6 +47,11 @@ export default function Footer() {
                   Twitter / X Video (/tw)
                 </Link>
               </li>
+              <li>
+                <Link href="/th" className="hover:text-emerald-600 transition-colors">
+                  Threads Downloader (/th)
+                </Link>
+              </li>
             </ul>
           </div>
 
