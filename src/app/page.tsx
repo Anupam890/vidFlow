@@ -9,6 +9,7 @@ import Features from "@/components/Features";
 import HowItWorks from "@/components/HowItWorks";
 import Faq from "@/components/Faq";
 import Footer from "@/components/Footer";
+import AdSlot from "@/components/ads/AdSlot";
 import { ExtractedMedia } from "@/lib/types";
 
 export default function Home() {
@@ -37,6 +38,9 @@ export default function Home() {
         {/* Results Card if video extracted */}
         {extractedMedia && <DownloadCard media={extractedMedia} />}
 
+        {/* Top Banner Ad Space */}
+        <AdSlot slot="top-banner" />
+
         {/* Supported Platforms */}
         <SupportedPlatforms />
 
@@ -45,6 +49,9 @@ export default function Home() {
 
         {/* How it Works Walkthrough */}
         <HowItWorks />
+
+        {/* Content Divider Banner Ad */}
+        <AdSlot slot="between-sections" />
 
         {/* FAQs */}
         <Faq />

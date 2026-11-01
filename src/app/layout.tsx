@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
 import JsonLd from "@/components/JsonLd";
+import MonetagScripts from "@/components/ads/MonetagScripts";
+import StickyBottomAd from "@/components/ads/StickyBottomAd";
 import {
   SITE_URL,
   SITE_NAME,
@@ -114,12 +116,14 @@ export default function RootLayout({
         <meta name="google-site-verification" content="6MUeO2-_VKn2Rf5Gn0i2fzJsr5tIY0oWnphtjvdAMqk" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-icon" />
+        <MonetagScripts />
         <JsonLd data={getWebSiteSchema()} />
         <JsonLd data={getSoftwareApplicationSchema()} />
         <JsonLd data={getOrganizationSchema()} />
       </head>
-      <body className="min-h-full flex flex-col bg-[#f8fafc] text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-800">
+      <body className="min-h-full flex flex-col bg-[#f8fafc] text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-800 pb-16">
         <LanguageProvider>{children}</LanguageProvider>
+        <StickyBottomAd />
       </body>
     </html>
   );

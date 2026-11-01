@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { ExtractedMedia, MediaFormat } from "@/lib/types";
 import { useTranslation } from "@/context/LanguageContext";
+import AdSlot from "@/components/ads/AdSlot";
 
 interface DownloadCardProps {
   media: ExtractedMedia;
@@ -737,6 +738,9 @@ export default function DownloadCard({ media }: DownloadCardProps) {
               )}
             </div>
           )}
+
+          {/* Monetag Inline Download Card Banner Ad */}
+          <AdSlot slot="download-card" />
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import DownloadCard from "@/components/DownloadCard";
 import Features from "@/components/Features";
 import HowItWorks from "@/components/HowItWorks";
 import Footer from "@/components/Footer";
+import AdSlot from "@/components/ads/AdSlot";
 import { ExtractedMedia, Platform } from "@/lib/types";
 import { ChevronDown, Sparkles } from "lucide-react";
 import JsonLd from "@/components/JsonLd";
@@ -72,6 +73,9 @@ export default function PlatformPageTemplate({
 
         {extractedMedia && <DownloadCard media={extractedMedia} />}
 
+        {/* Top Banner Ad Space */}
+        <AdSlot slot="top-banner" />
+
         {/* Platform Specific Feature Guide */}
         <section className="py-16 border-t border-slate-200/80 bg-white">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -107,6 +111,9 @@ export default function PlatformPageTemplate({
 
         {/* Walkthrough */}
         <HowItWorks />
+
+        {/* Content Divider Banner Ad */}
+        <AdSlot slot="between-sections" />
 
         {/* Custom FAQs for this platform */}
         <section className="py-16 bg-slate-50/60 border-t border-slate-200/80">
