@@ -85,7 +85,7 @@ export default function SupportedPlatforms() {
   ];
 
   return (
-    <section className="relative py-20 bg-slate-50/60 border-t border-slate-200/80">
+    <section id="platforms" className="relative py-20 bg-slate-50/60 border-t border-slate-200/80 scroll-mt-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <h2 className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-2">
