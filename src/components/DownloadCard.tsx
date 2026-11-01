@@ -71,6 +71,8 @@ export default function DownloadCard({ media }: DownloadCardProps) {
   const [formatFilter, setFormatFilter] = useState<"all" | "mp4" | "webm">("all");
   const [resolutionFilter, setResolutionFilter] = useState<string>("all");
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
+  const [completedId, setCompletedId] = useState<string | null>(null);
 
   const [isVertical, setIsVertical] = useState<boolean>(() => {
     const lowerUrl = (media.url || "").toLowerCase();
@@ -100,14 +102,18 @@ export default function DownloadCard({ media }: DownloadCardProps) {
     return media.platform === "tiktok" || media.platform === "pinterest";
   });
 
-  const handleDownload = (
+  const handleDownload = async (
     format?: MediaFormat,
     isAudio = false,
     audioQuality = "320kbps",
     audioExt = "mp3"
   ) => {
     const id = format?.id || (isAudio ? `audio_${audioQuality}_${audioExt}` : "best");
+    if (downloadingId) return;
+
     setDownloadingId(id);
+    setDownloadProgress(null);
+    setCompletedId(null);
 
     // Extract clean resolution token (e.g. "1080p", "720p", "4K", or "320kbps")
     const cleanResolution = isAudio
@@ -143,13 +149,70 @@ export default function DownloadCard({ media }: DownloadCardProps) {
 
     const downloadEndpoint = `/api/download?${params.toString()}`;
 
-    // Directly trigger browser download immediately
-    triggerBrowserDownload(downloadEndpoint, expectedFilename);
+    try {
+      const response = await fetch(downloadEndpoint);
 
-    // Reset button state after brief feedback
-    setTimeout(() => {
+      if (!response.ok) {
+        throw new Error(`Download failed with status ${response.status}`);
+      }
+
+      if (!response.body) {
+        // Fallback for browsers without stream reader
+        triggerBrowserDownload(downloadEndpoint, expectedFilename);
+        setCompletedId(id);
+        setDownloadingId(null);
+        setTimeout(() => setCompletedId(null), 3000);
+        return;
+      }
+
+      const contentLength = Number(response.headers.get("Content-Length")) || 0;
+      const reader = response.body.getReader();
+      const chunks: Uint8Array[] = [];
+      let receivedLength = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (value) {
+          chunks.push(value);
+          receivedLength += value.length;
+          if (contentLength > 0) {
+            const percent = Math.min(99, Math.round((receivedLength / contentLength) * 100));
+            setDownloadProgress(percent);
+          }
+        }
+      }
+
+      const mimeType = response.headers.get("Content-Type") || (isAudio ? "audio/mpeg" : "video/mp4");
+      const blob = new Blob(chunks as any, { type: mimeType });
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Directly trigger the file saving
+      triggerBrowserDownload(blobUrl, expectedFilename);
+
+      setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+      }, 15000);
+
+      // Transition to Saved state
+      setDownloadProgress(100);
+      setCompletedId(id);
       setDownloadingId(null);
-    }, 2000);
+
+      setTimeout(() => {
+        setCompletedId(null);
+        setDownloadProgress(null);
+      }, 3000);
+    } catch (err) {
+      console.error("Stream download error, falling back to direct browser download:", err);
+      triggerBrowserDownload(downloadEndpoint, expectedFilename);
+      setCompletedId(id);
+      setDownloadingId(null);
+      setTimeout(() => {
+        setCompletedId(null);
+        setDownloadProgress(null);
+      }, 3000);
+    }
   };
 
   const uniqueResolutions = Array.from(
@@ -433,6 +496,7 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                     const sizeBytes = fmt.filesize || fmt.filesizeApprox;
                     const sizeText = formatBytes(sizeBytes);
                     const isDownloading = downloadingId === fmt.id;
+                    const isCompleted = completedId === fmt.id;
 
                     // Parse resolution cleanly (e.g. "1080p", "720p")
                     const resMatch = fmt.quality.match(/\d+p|\d+K/i);
@@ -494,6 +558,8 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                             className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold shadow-xs transition-all cursor-pointer whitespace-nowrap min-w-[140px] ${
                               isDownloading
                                 ? "bg-emerald-100 text-emerald-800 border border-emerald-300 ring-2 ring-emerald-500/20"
+                                : isCompleted
+                                ? "bg-emerald-600 text-white shadow-emerald-600/30 ring-2 ring-emerald-600/40"
                                 : downloadingId
                                 ? "opacity-50 cursor-not-allowed bg-slate-100 text-slate-400"
                                 : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20 hover:shadow-md"
@@ -502,7 +568,16 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                             {isDownloading ? (
                               <>
                                 <Loader2 className="h-4 w-4 text-emerald-700 animate-spin" />
-                                <span>Starting Download...</span>
+                                <span>
+                                  {downloadProgress !== null && downloadProgress > 0
+                                    ? `Downloading ${downloadProgress}%`
+                                    : "Downloading..."}
+                                </span>
+                              </>
+                            ) : isCompleted ? (
+                              <>
+                                <Check className="h-4 w-4 text-white" />
+                                <span>Saved!</span>
                               </>
                             ) : (
                               <>
@@ -575,7 +650,9 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                 ];
 
                 return audioItems.map((opt) => {
-                  const isDownloading = downloadingId === `audio_${opt.rate}_${opt.ext}`;
+                  const audioKey = `audio_${opt.rate}_${opt.ext}`;
+                  const isDownloading = downloadingId === audioKey;
+                  const isCompleted = completedId === audioKey;
                   const sizeText = formatBytes(opt.size);
 
                   return (
@@ -622,9 +699,11 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                         <button
                           onClick={() => handleDownload(undefined, true, opt.rate, opt.ext)}
                           disabled={!!downloadingId}
-                          className={`w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs font-semibold shadow-xs transition-all cursor-pointer whitespace-nowrap ${
+                          className={`w-full sm:w-auto flex items-center justify-center gap-1.5 rounded-xl px-5 py-2.5 text-xs font-semibold shadow-xs transition-all cursor-pointer whitespace-nowrap min-w-[140px] ${
                             isDownloading
                               ? "bg-teal-100 text-teal-800 border border-teal-300 ring-2 ring-teal-500/20"
+                              : isCompleted
+                              ? "bg-teal-600 text-white shadow-teal-600/30 ring-2 ring-teal-600/40"
                               : downloadingId
                               ? "opacity-50 cursor-not-allowed bg-slate-100 text-slate-400"
                               : "bg-teal-600 hover:bg-teal-500 text-white shadow-teal-600/20 hover:shadow-md"
@@ -633,7 +712,16 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                           {isDownloading ? (
                             <>
                               <Loader2 className="h-4 w-4 animate-spin text-teal-700" />
-                              <span>Starting Download...</span>
+                              <span>
+                                {downloadProgress !== null && downloadProgress > 0
+                                  ? `Downloading ${downloadProgress}%`
+                                  : "Downloading..."}
+                              </span>
+                            </>
+                          ) : isCompleted ? (
+                            <>
+                              <Check className="h-4 w-4 text-white" />
+                              <span>Saved!</span>
                             </>
                           ) : (
                             <>
