@@ -57,20 +57,21 @@ export default function MonetagScripts() {
         />
       )}
 
-      {/* 4. Monetag Web Push Tag for Zone 12166520 */}
-      {ADS_CONFIG.pushNotifications.enabled && ADS_CONFIG.pushNotifications.tagScriptUrl && (
+      {/* 4. Monetag Vignette Banner (Zone 12166633) */}
+      {ADS_CONFIG.vignette.enabled && ADS_CONFIG.vignette.scriptUrl && (
         <Script
-          id="monetag-push-tag"
-          src={ADS_CONFIG.pushNotifications.tagScriptUrl}
+          id="monetag-vignette"
+          src={ADS_CONFIG.vignette.scriptUrl}
+          data-zone={ADS_CONFIG.vignette.zoneId}
           strategy="afterInteractive"
         />
       )}
 
-      {/* 5. Vignette (Interstitial banner on download click) */}
-      {ADS_CONFIG.vignetteScriptUrl && (
+      {/* 5. Monetag Web Push Tag for Zone 12166520 */}
+      {ADS_CONFIG.pushNotifications.enabled && ADS_CONFIG.pushNotifications.tagScriptUrl && (
         <Script
-          id="monetag-vignette"
-          src={ADS_CONFIG.vignetteScriptUrl}
+          id="monetag-push-tag"
+          src={ADS_CONFIG.pushNotifications.tagScriptUrl}
           strategy="afterInteractive"
         />
       )}

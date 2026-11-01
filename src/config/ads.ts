@@ -37,8 +37,12 @@ export const ADS_CONFIG = {
     zoneId: "12166629",
   },
 
-  // 5. Vignette / Interstitial (shows on download click)
-  vignetteScriptUrl: "",
+  // 5. Vignette Banner (Zone 12166633)
+  vignette: {
+    enabled: true,
+    scriptUrl: "https://n6wxm.com/vignette.min.js",
+    zoneId: "12166633",
+  },
 
   // 6. Banner Zone IDs / Script URLs (For display banners)
   zones: {
