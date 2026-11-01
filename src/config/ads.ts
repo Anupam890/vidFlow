@@ -20,7 +20,6 @@ export const ADS_CONFIG = {
     swPath: "/sw.js",
     zoneId: 12166520,
     domain: "5gvci.com",
-    // Official Monetag tag for zone 12166520
     tagScriptUrl: "https://5gvci.com/pfe/current/tag.min.js?z=12166520",
   },
 
@@ -31,11 +30,17 @@ export const ADS_CONFIG = {
     zoneId: "304353",
   },
 
-  // 4. Other Automated Formats (can be added anytime)
-  inPagePushScriptUrl: "", // In-Page Push (Native notification badge)
-  vignetteScriptUrl: "",   // Vignette / Interstitial (shows on download click)
+  // 4. In-Page Push (Banner) (Zone 12166629)
+  inPagePush: {
+    enabled: true,
+    scriptUrl: "https://nap5k.com/tag.min.js",
+    zoneId: "12166629",
+  },
 
-  // 5. Banner Zone IDs / Script URLs (For display banners)
+  // 5. Vignette / Interstitial (shows on download click)
+  vignetteScriptUrl: "",
+
+  // 6. Banner Zone IDs / Script URLs (For display banners)
   zones: {
     // Top banner directly below the search input (728x90 desktop / 300x250 mobile)
     topBanner: {

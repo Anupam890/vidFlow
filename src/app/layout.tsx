@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import JsonLd from "@/components/JsonLd";
 import MonetagScripts from "@/components/ads/MonetagScripts";
 import StickyBottomAd from "@/components/ads/StickyBottomAd";
+import { Analytics } from "@vercel/analytics/react";
 import {
   SITE_URL,
   SITE_NAME,
@@ -124,6 +125,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-[#f8fafc] text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-800 pb-16">
         <LanguageProvider>{children}</LanguageProvider>
         <StickyBottomAd />
+        <Analytics />
       </body>
     </html>
   );

@@ -35,14 +35,14 @@ export default function StickyBottomAd() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] py-1.5 px-3 transition-transform duration-300">
-      <div className="mx-auto max-w-4xl relative flex items-center justify-center min-h-[50px] sm:min-h-[60px]">
+      <div className="mx-auto max-w-4xl relative flex items-center justify-center min-h-[46px] sm:min-h-[50px]">
         {/* Dismiss Button */}
         <button
           onClick={handleDismiss}
           aria-label="Close Advertisement"
-          className="absolute -top-3 right-0 sm:right-2 flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-white hover:bg-slate-900 shadow-md transition-colors cursor-pointer text-xs"
+          className="absolute -top-2.5 right-0 sm:right-2 flex h-5 w-5 items-center justify-center rounded-full bg-slate-700 text-white hover:bg-slate-900 shadow-md transition-colors cursor-pointer text-xs"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="h-3 w-3" />
         </button>
 
         {hasRealAd ? (
@@ -52,12 +52,9 @@ export default function StickyBottomAd() {
             className="flex items-center justify-center w-full"
           />
         ) : (
-          <div className="flex items-center justify-center gap-3 text-center">
-            <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-800">
-              Sticky Ad
-            </span>
-            <span className="text-xs font-medium text-slate-600">
-              Sticky Bottom Anchor (320x50 Mobile / 728x90 Desktop) • Ready for Monetag
+          <div className="flex items-center justify-center">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              Advertisement
             </span>
           </div>
         )}
@@ -65,4 +62,3 @@ export default function StickyBottomAd() {
     </div>
   );
 }
-

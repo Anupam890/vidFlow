@@ -47,20 +47,21 @@ export default function MonetagScripts() {
         />
       )}
 
-      {/* 3. Monetag Web Push Tag for Zone 12166520 */}
-      {ADS_CONFIG.pushNotifications.enabled && ADS_CONFIG.pushNotifications.tagScriptUrl && (
+      {/* 3. Monetag In-Page Push (Zone 12166629) */}
+      {ADS_CONFIG.inPagePush.enabled && ADS_CONFIG.inPagePush.scriptUrl && (
         <Script
-          id="monetag-push-tag"
-          src={ADS_CONFIG.pushNotifications.tagScriptUrl}
+          id="monetag-in-page-push"
+          src={ADS_CONFIG.inPagePush.scriptUrl}
+          data-zone={ADS_CONFIG.inPagePush.zoneId}
           strategy="afterInteractive"
         />
       )}
 
-      {/* 4. In-Page Push (Native Notification Widget) */}
-      {ADS_CONFIG.inPagePushScriptUrl && (
+      {/* 4. Monetag Web Push Tag for Zone 12166520 */}
+      {ADS_CONFIG.pushNotifications.enabled && ADS_CONFIG.pushNotifications.tagScriptUrl && (
         <Script
-          id="monetag-in-page-push"
-          src={ADS_CONFIG.inPagePushScriptUrl}
+          id="monetag-push-tag"
+          src={ADS_CONFIG.pushNotifications.tagScriptUrl}
           strategy="afterInteractive"
         />
       )}
