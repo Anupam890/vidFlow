@@ -10,7 +10,6 @@ import {
   Check,
   Volume2,
   FileVideo,
-  HardDrive,
   SlidersHorizontal,
   RotateCcw,
   Loader2,
@@ -487,14 +486,11 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                   ) : (
                     <>
                       <div className="flex items-center justify-between px-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                        <span>Resolution & Spec</span>
-                        <span className="hidden sm:inline">Total File Size</span>
+                        <span>Resolution & Quality</span>
                         <span>Download Action</span>
                       </div>
 
                   {displayedVideos.map((fmt) => {
-                    const sizeBytes = fmt.filesize || fmt.filesizeApprox;
-                    const sizeText = formatBytes(sizeBytes);
                     const isDownloading = downloadingId === fmt.id;
                     const isCompleted = completedId === fmt.id;
 
@@ -536,21 +532,8 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                           </div>
                         </div>
 
-                        {/* Size & Download Button */}
-                        <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200">
-                          {/* Resolution - Total MB Badge */}
-                          <div className="flex items-center gap-1.5 rounded-lg bg-white border border-slate-200 px-3 py-1.5 shadow-xs">
-                            <HardDrive className="h-3.5 w-3.5 text-emerald-600" />
-                            <div className="text-left">
-                              <span className="text-[10px] text-slate-400 uppercase block font-semibold leading-none">
-                                Total Size
-                              </span>
-                              <span className="text-xs font-mono font-bold text-slate-800">
-                                {sizeText}
-                              </span>
-                            </div>
-                          </div>
-
+                        {/* Download Button */}
+                        <div className="flex items-center justify-end w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200">
                           {/* Action Button */}
                           <button
                             onClick={() => handleDownload(fmt)}
@@ -653,7 +636,6 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                   const audioKey = `audio_${opt.rate}_${opt.ext}`;
                   const isDownloading = downloadingId === audioKey;
                   const isCompleted = completedId === audioKey;
-                  const sizeText = formatBytes(opt.size);
 
                   return (
                     <div
@@ -682,20 +664,7 @@ export default function DownloadCard({ media }: DownloadCardProps) {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200">
-                        {/* Audio Total Size Badge */}
-                        <div className="flex items-center gap-1.5 rounded-lg bg-white border border-slate-200 px-3 py-1.5 shadow-xs">
-                          <HardDrive className="h-3.5 w-3.5 text-teal-600" />
-                          <div className="text-left">
-                            <span className="text-[10px] text-slate-400 uppercase block font-semibold leading-none">
-                              Total Size
-                            </span>
-                            <span className="text-xs font-mono font-bold text-slate-800">
-                              {sizeText}
-                            </span>
-                          </div>
-                        </div>
-
+                      <div className="flex items-center justify-end w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200">
                         <button
                           onClick={() => handleDownload(undefined, true, opt.rate, opt.ext)}
                           disabled={!!downloadingId}
